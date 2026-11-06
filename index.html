@@ -5,18 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>薩摩川内 街角看板探訪マップ</title>
   <style>
+    :root {
+      --bg-color: #0d0f12;
+      --card-bg: rgba(22, 27, 34, 0.85);
+      --card-border: rgba(255, 204, 0, 0.3);
+      --text-main: #ffffff;
+      --text-sub: #ccc;
+      --grid-color: rgba(255,255,255,0.03);
+    }
+
+    /* 昼モードのテーマ変数 */
+    body.day-mode {
+      --bg-color: #eef2f5;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-border: rgba(0, 150, 255, 0.3);
+      --text-main: #1a1a1a;
+      --text-sub: #555555;
+      --grid-color: rgba(0,0,0,0.05);
+    }
+
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #0d0f12;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      color: #fff;
+      background-color: var(--bg-color);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text-main);
       user-select: none;
       -webkit-user-select: none;
       touch-action: pan-x pan-y pinch-zoom;
+      transition: background-color 0.5s ease;
     }
 
     .viewport {
@@ -26,7 +46,6 @@
       overflow: hidden;
     }
 
-    /* 霧用キャンバス（タッチイベントを邪魔しないよう pointer-events: none） */
     #fogCanvas {
       position: absolute;
       top: 0;
@@ -46,8 +65,8 @@
       transform: translate(-50%, -50%);
       background-image: 
         radial-gradient(circle, rgba(255,204,0,0.2) 1px, transparent 1px),
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
       background-size: 30px 30px, 60px 60px, 60px 60px;
       will-change: transform;
     }
@@ -63,56 +82,88 @@
     }
 
     .center-title h1 {
-      font-size: 1.8rem;
+      font-size: clamp(1.4rem, 4vw, 1.8rem);
       letter-spacing: 0.05em;
       margin: 0 0 8px 0;
       color: #ffcc00;
       text-shadow: 0 0 10px rgba(255,204,0,0.5);
+      transition: color 0.5s;
+    }
+
+    body.day-mode .center-title h1 {
+      color: #0077ff;
+      text-shadow: 0 0 10px rgba(0,119,255,0.3);
     }
 
     .center-title p {
-      color: #aaa;
+      color: var(--text-sub);
       font-size: 0.85rem;
       line-height: 1.4;
     }
 
+    /* レスポンシブなカード定義 */
     .signboard-card {
       position: absolute;
-      width: 200px;
+      width: clamp(170px, 45vw, 220px);
       padding: 16px;
-      background: rgba(22, 27, 34, 0.85);
-      border: 1px solid rgba(255, 204, 0, 0.3);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
       will-change: transform;
-      transition: border-color 0.2s, transform 0.1s ease-out;
+      transition: border-color 0.3s, background 0.5s, box-shadow 0.3s;
       z-index: 10;
     }
 
-    .signboard-card:active {
-      border-color: #ffcc00;
-      transform: scale(0.96) !important;
+    /* 夜モード時の発光効果 */
+    body:not(.day-mode) .signboard-card:hover,
+    body:not(.day-mode) .signboard-card:active {
+      border-color: #ff007f;
+      box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
+    }
+
+    /* 昼モード時の発光効果 */
+    body.day-mode .signboard-card:hover,
+    body.day-mode .signboard-card:active {
+      border-color: #00d4ff;
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
     }
 
     .signboard-img {
       width: 100%;
-      height: 120px;
+      height: 110px;
       border-radius: 8px;
-      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
       margin-bottom: 10px;
+      transition: all 0.5s ease;
     }
+
+    /* 夜のネオン演出風グラデーション */
+    .night-bg-1 { background: linear-gradient(135deg, #ff007f, #7928ca); color: #fff; text-shadow: 0 0 8px #fff; }
+    .night-bg-2 { background: linear-gradient(135deg, #00f2fe, #4facfe); color: #fff; text-shadow: 0 0 8px #fff; }
+    .night-bg-3 { background: linear-gradient(135deg, #f857a6, #ff5858); color: #fff; text-shadow: 0 0 8px #fff; }
+    .night-bg-4 { background: linear-gradient(135deg, #ff8008, #ffc837); color: #fff; text-shadow: 0 0 8px #fff; }
+
+    /* 昼の爽やかなグラデーション */
+    body.day-mode .night-bg-1 { background: linear-gradient(135deg, #a8edd9, #fed6e3); color: #333; text-shadow: none; }
+    body.day-mode .night-bg-2 { background: linear-gradient(135deg, #c2e9fb, #a1c4fd); color: #333; text-shadow: none; }
+    body.day-mode .night-bg-3 { background: linear-gradient(135deg, #fddb92, #d1fdff); color: #333; text-shadow: none; }
+    body.day-mode .night-bg-4 { background: linear-gradient(135deg, #e0c3fc, #8ec5fc); color: #333; text-shadow: none; }
 
     .signboard-card h3 {
       margin: 0 0 4px 0;
-      font-size: 1rem;
-      color: #fff;
+      font-size: 0.95rem;
+      color: var(--text-main);
     }
 
     .signboard-card .tag {
       display: inline-block;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       padding: 2px 8px;
       background-color: rgba(255, 204, 0, 0.15);
       color: #ffcc00;
@@ -120,11 +171,28 @@
       margin-bottom: 8px;
     }
 
+    body.day-mode .signboard-card .tag {
+      background-color: rgba(0, 119, 255, 0.1);
+      color: #0077ff;
+    }
+
+    /* ズーム度合いで表示・非表示を切り替える詳細テキスト */
     .signboard-card p {
       margin: 0;
       font-size: 0.75rem;
-      color: #ccc;
+      color: var(--text-sub);
       line-height: 1.4;
+      opacity: 1;
+      max-height: 100px;
+      transition: opacity 0.3s ease, max-height 0.3s ease;
+      overflow: hidden;
+    }
+
+    /* ズームアウト（引いた視点）時に詳細文を隠すクラス */
+    .signboard-card.is-zoomed-out p {
+      opacity: 0;
+      max-height: 0;
+      margin: 0;
     }
 
     .spot-1 { top: 38%; left: 35%; }
@@ -132,27 +200,40 @@
     .spot-3 { top: 62%; left: 32%; }
     .spot-4 { top: 58%; left: 65%; }
 
+    /* スマホ固定UI */
     .hud-controls {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
+      bottom: clamp(16px, 4vw, 24px);
+      right: clamp(16px, 4vw, 24px);
       z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .btn-recenter {
-      width: 52px;
-      height: 52px;
+    .btn-hud {
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       background: #ffcc00;
       color: #000;
       border: none;
-      font-weight: bold;
       font-size: 1.2rem;
-      box-shadow: 0 4px 16px rgba(255,204,0,0.4);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+
+    .btn-hud:active {
+      transform: scale(0.9);
+    }
+
+    body.day-mode .btn-hud {
+      background: #0077ff;
+      color: #fff;
     }
   </style>
 </head>
@@ -163,33 +244,33 @@
 
     <div class="world" id="world">
       <div class="center-title">
-        <h1>薩摩川内<br>看板探訪MAP</h1>
-        <p>指でドラッグ＆ピンチでズーム<br>気になる看板をタップしてみよう</p>
+        <h1 id="mainTitle">薩摩川内<br>看板探訪MAP</h1>
+        <p>ドラッグ＆ピンチで街を探索<br>☀️/🌙 ボタンで時間切替</p>
       </div>
 
       <div class="signboard-card spot-1 js-card">
-        <div class="signboard-img" style="background: linear-gradient(135deg, #ff5e62, #ff9966); display: flex; align-items: center; justify-content: center; font-weight: bold;">レトロ居酒屋</div>
+        <div class="signboard-img night-bg-1" id="img1">居酒屋 ネオン</div>
         <span class="tag">向田本町エリア</span>
         <h3>昭和風情のネオン看板</h3>
-        <p>夜になると味わい深い光を放つ、創業40年の老舗居酒屋のシンボル。</p>
+        <p>夜になると妖艶なピンク色に光を放つ、創業40年の老舗居酒屋のシンボル。</p>
       </div>
 
       <div class="signboard-card spot-2 js-card">
-        <div class="signboard-img" style="background: linear-gradient(135deg, #42e695, #3bb2b8); display: flex; align-items: center; justify-content: center; font-weight: bold;">モダンカフェ</div>
+        <div class="signboard-img night-bg-2" id="img2">カフェ サイネージ</div>
         <span class="tag">川内駅前エリア</span>
         <h3>鉄文字のシンプル看板</h3>
-        <p>昼の光と夜の影で表情が変わる、スタイリッシュな切り文字デザイン。</p>
+        <p>昼の太陽光と夜の影で大きく表情が変わるスタイリッシュな切り文字デザイン。</p>
       </div>
 
       <div class="signboard-card spot-3 js-card">
-        <div class="signboard-img" style="background: linear-gradient(135deg, #f857a6, #ff5858); display: flex; align-items: center; justify-content: center; font-weight: bold;">うなぎ専門店</div>
+        <div class="signboard-img night-bg-3" id="img3">割烹 銘木板</div>
         <span class="tag">国道沿いエリア</span>
         <h3>木彫り墨文字看板</h3>
-        <p>重厚感あふれる一枚板に手書きされた、歴史を感じる職人技の看板。</p>
+        <p>重厚感あふれる一枚板に手書きされた、歴史と伝統を感じる職人技の看板。</p>
       </div>
 
       <div class="signboard-card spot-4 js-card">
-        <div class="signboard-img" style="background: linear-gradient(135deg, #abecd6, #fbed96); color:#333; display: flex; align-items: center; justify-content: center; font-weight: bold;">スイーツショップ</div>
+        <div class="signboard-img night-bg-4" id="img4">スイーツ イラスト</div>
         <span class="tag">山形屋周辺</span>
         <h3>手書きイラスト看板</h3>
         <p>季節ごとに描き直される、アットホームなスタンド型のイラスト板。</p>
@@ -198,17 +279,22 @@
   </div>
 
   <div class="hud-controls">
-    <button class="btn-recenter" id="recenterBtn">🎯</button>
+    <button class="btn-hud" id="themeBtn">🌙</button>
+    <button class="btn-hud" id="recenterBtn">🎯</button>
   </div>
 
   <script>
     const viewport = document.getElementById('viewport');
     const world = document.getElementById('world');
     const recenterBtn = document.getElementById('recenterBtn');
+    const themeBtn = document.getElementById('themeBtn');
     const fogCanvas = document.getElementById('fogCanvas');
     const ctx = fogCanvas.getContext('2d');
+    const cards = document.querySelectorAll('.js-card');
 
-    // 画面リサイズ対応
+    let isDayMode = false;
+
+    // 画面リサイズ
     function resizeCanvas() {
       fogCanvas.width = window.innerWidth;
       fogCanvas.height = window.innerHeight;
@@ -216,11 +302,24 @@
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    // 昼夜モード切り替え
+    themeBtn.addEventListener('click', () => {
+      isDayMode = !isDayMode;
+      document.body.classList.toggle('day-mode', isDayMode);
+      themeBtn.innerText = isDayMode ? '☀️' : '🌙';
+
+      // 看板テキストの昼夜表記更新
+      document.getElementById('img1').innerText = isDayMode ? '居酒屋 日中' : '居酒屋 ネオン';
+      document.getElementById('img2').innerText = isDayMode ? 'カフェ 昼の木陰' : 'カフェ サイネージ';
+      document.getElementById('img3').innerText = isDayMode ? '割烹 陽光' : '割烹 銘木板';
+      document.getElementById('img4').innerText = isDayMode ? 'スイーツ 昼下がり' : 'スイーツ イラスト';
+    });
+
     // 座標・スケール管理
     let currentX = 0, currentY = 0, targetX = 0, targetY = 0;
     let currentScale = 1, targetScale = 1;
 
-    // タッチ・ピンチ操作管理
+    // タッチ・ピンチ管理
     let isDragging = false;
     let startX = 0, startY = 0, lastX = 0, lastY = 0;
     let initialPinchDistance = null, initialScale = 1;
@@ -228,29 +327,27 @@
     // 霧パーティクル配列
     const fogParticles = [];
 
+    // 霧の生成（昼夜で色変更）
     function addFog(x, y) {
-      // 触れた位置に数個の小さな霧粒子を生成
       for (let i = 0; i < 2; i++) {
         fogParticles.push({
           x: x + (Math.random() - 0.5) * 20,
           y: y + (Math.random() - 0.5) * 20,
           radius: 20 + Math.random() * 25,
-          alpha: 0.18, // 薄く邪魔にならない濃度
+          alpha: 0.22,
           vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4 - 0.2 // かすかに上へたなびく
+          vy: (Math.random() - 0.5) * 0.4 - 0.2
         });
       }
     }
 
-    function getDistance(touch1, touch2) {
-      return Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+    function getDistance(t1, t2) {
+      return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
     }
 
-    // タッチ開始
+    // タッチイベント
     viewport.addEventListener('touchstart', (e) => {
-      for (let i = 0; i < e.touches.length; i++) {
-        addFog(e.touches[i].clientX, e.touches[i].clientY);
-      }
+      for (let i = 0; i < e.touches.length; i++) addFog(e.touches[i].clientX, e.touches[i].clientY);
 
       if (e.touches.length === 1) {
         isDragging = true;
@@ -263,12 +360,8 @@
       }
     }, { passive: true });
 
-    // タッチ移動（スクロール中・ピンチインアウト中も発生）
     viewport.addEventListener('touchmove', (e) => {
-      // すべての指の位置に霧を発生させる
-      for (let i = 0; i < e.touches.length; i++) {
-        addFog(e.touches[i].clientX, e.touches[i].clientY);
-      }
+      for (let i = 0; i < e.touches.length; i++) addFog(e.touches[i].clientX, e.touches[i].clientY);
 
       if (e.touches.length === 1 && isDragging) {
         targetX = e.touches[0].clientX - startX;
@@ -277,8 +370,7 @@
         targetY = Math.max(-800, Math.min(800, targetY));
       } else if (e.touches.length === 2 && initialPinchDistance) {
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
-        const factor = currentDistance / initialPinchDistance;
-        targetScale = Math.max(0.5, Math.min(2.5, initialScale * factor));
+        targetScale = Math.max(0.5, Math.min(2.5, initialScale * (currentDistance / initialPinchDistance)));
       }
     }, { passive: true });
 
@@ -291,7 +383,6 @@
       }
     });
 
-    // PCでのテスト用（マウス操作時も霧を発生）
     viewport.addEventListener('mousemove', (e) => {
       if (e.buttons === 1) addFog(e.clientX, e.clientY);
     });
@@ -300,33 +391,51 @@
       targetX = 0; targetY = 0; lastX = 0; lastY = 0; targetScale = 1;
     });
 
-    // メインアニメーション描画（マップ移動＋霧の更新）
+    // アニメーションループ
     function animate() {
-      // 1. マップ移動
+      // スムース移動 ＆ パララックス
       currentX += (targetX - currentX) * 0.1;
       currentY += (targetY - currentY) * 0.1;
       currentScale += (targetScale - currentScale) * 0.1;
+
       world.style.transform = `translate(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px)) scale(${currentScale})`;
 
-      // 2. 霧の描画更新
+      // ① スケール連動：縮小時は詳細文字を非表示に
+      cards.forEach(card => {
+        if (currentScale < 0.85) {
+          card.classList.add('is-zoomed-out');
+        } else {
+          card.classList.remove('is-zoomed-out');
+        }
+      });
+
+      // ③ 霧の描画（昼：淡い水色 / 夜：ネオンピンク）
       ctx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
       for (let i = fogParticles.length - 1; i >= 0; i--) {
         const p = fogParticles[i];
         p.x += p.vx;
         p.y += p.vy;
-        p.radius += 0.4; // じわっと広がる
-        p.alpha -= 0.004; // 徐々に消える
+        p.radius += 0.4;
+        p.alpha -= 0.005;
 
         if (p.alpha <= 0) {
           fogParticles.splice(i, 1);
           continue;
         }
 
-        // 円形グラデーションでソフトな霧を描く
         const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-        grad.addColorStop(0, `rgba(255, 255, 255, ${p.alpha})`);
-        grad.addColorStop(0.6, `rgba(255, 204, 0, ${p.alpha * 0.3})`); // 薩摩川内カラーのほんのり黄色
-        grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        
+        if (isDayMode) {
+          // 昼：淡い水色（シアン/ブルー系）
+          grad.addColorStop(0, `rgba(160, 230, 255, ${p.alpha})`);
+          grad.addColorStop(0.6, `rgba(0, 150, 255, ${p.alpha * 0.4})`);
+          grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        } else {
+          // 夜：ネオンピンク系
+          grad.addColorStop(0, `rgba(255, 0, 150, ${p.alpha})`);
+          grad.addColorStop(0.6, `rgba(255, 0, 100, ${p.alpha * 0.4})`);
+          grad.addColorStop(1, 'rgba(255, 0, 150, 0)');
+        }
 
         ctx.fillStyle = grad;
         ctx.beginPath();
