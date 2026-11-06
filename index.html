@@ -7,7 +7,7 @@
   <style>
     :root {
       --bg-color: #0c0e12;
-      --card-bg: rgba(22, 27, 34, 0.88);
+      --card-bg: rgba(22, 27, 34, 0.92);
       --card-border: rgba(255, 204, 0, 0.3);
       --text-main: #ffffff;
       --text-sub: #ccc;
@@ -16,7 +16,7 @@
 
     body.day-mode {
       --bg-color: #eef2f5;
-      --card-bg: rgba(255, 255, 255, 0.9);
+      --card-bg: rgba(255, 255, 255, 0.95);
       --card-border: rgba(0, 150, 255, 0.3);
       --text-main: #1a1a1a;
       --text-sub: #555555;
@@ -43,6 +43,11 @@
       height: 100vh;
       position: relative;
       overflow: hidden;
+      cursor: grab;
+    }
+
+    .viewport:active {
+      cursor: grabbing;
     }
 
     #fogCanvas {
@@ -72,11 +77,11 @@
       will-change: transform;
     }
 
-    /* 中景 */
+    /* 中景（ワールド） */
     .world {
       position: absolute;
-      width: 2600px;
-      height: 2600px;
+      width: 2400px;
+      height: 2400px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -86,8 +91,8 @@
     /* 近景 */
     .parallax-fg {
       position: absolute;
-      width: 2200px;
-      height: 2200px;
+      width: 2000px;
+      height: 2000px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -108,7 +113,7 @@
     }
 
     .center-title h1 {
-      font-size: clamp(1.8rem, 5vw, 2.5rem);
+      font-size: clamp(1.8rem, 5vw, 2.4rem);
       letter-spacing: 0.05em;
       margin: 0 0 8px 0;
       color: #ffcc00;
@@ -122,13 +127,13 @@
 
     .area-badge {
       position: absolute;
-      padding: 12px 24px;
+      padding: 10px 20px;
       background: rgba(255, 204, 0, 0.15);
       border: 2px solid #ffcc00;
       border-radius: 40px;
       color: #ffcc00;
       font-weight: bold;
-      font-size: 1.1rem;
+      font-size: 1rem;
       backdrop-filter: blur(8px);
       box-shadow: 0 0 20px rgba(255,204,0,0.3);
       transition: filter 0.3s ease, opacity 0.3s ease;
@@ -141,21 +146,22 @@
       color: #0077ff;
     }
 
-    .area-1 { top: 22%; left: 22%; }
-    .area-2 { top: 18%; left: 72%; }
-    .area-3 { top: 75%; left: 18%; }
-    .area-4 { top: 72%; left: 75%; }
+    /* 画面内で見切れないよう、配置位置を中央寄りに調整 */
+    .area-1 { top: 28%; left: 28%; }
+    .area-2 { top: 26%; left: 65%; }
+    .area-3 { top: 68%; left: 26%; }
+    .area-4 { top: 65%; left: 68%; }
 
     .signboard-card {
       position: absolute;
-      width: clamp(200px, 45vw, 250px);
+      width: clamp(210px, 35vw, 260px);
       padding: 16px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border-radius: 18px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
       will-change: transform, filter, opacity;
       transition: border-color 0.3s, background 0.5s, box-shadow 0.3s, filter 0.3s ease, opacity 0.3s ease;
       z-index: 10;
@@ -163,7 +169,7 @@
 
     .signboard-img {
       width: 100%;
-      height: 120px;
+      height: 110px;
       border-radius: 10px;
       display: flex;
       align-items: center;
@@ -199,7 +205,7 @@
       opacity: 0;
       max-height: 0;
       overflow: hidden;
-      transition: opacity 0.4s ease, max-height 0.4s ease, margin-top 0.4s ease;
+      transition: opacity 0.3s ease, max-height 0.3s ease, margin-top 0.3s ease;
       font-size: 0.75rem;
       color: var(--text-sub);
     }
@@ -214,7 +220,7 @@
       justify-content: space-between;
       margin-top: 8px;
       padding: 6px;
-      background: rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.08);
       border-radius: 6px;
       font-size: 0.7rem;
     }
@@ -224,13 +230,14 @@
       max-height: 200px;
       margin-top: 10px;
       padding-top: 8px;
-      border-top: 1px solid rgba(255,255,255,0.1);
+      border-top: 1px solid rgba(255,255,255,0.15);
     }
 
-    .spot-1 { top: 32%; left: 28%; }
-    .spot-2 { top: 25%; left: 62%; }
-    .spot-3 { top: 68%; left: 24%; }
-    .spot-4 { top: 64%; left: 66%; }
+    /* カード配置を見切り防止のため中央寄り（36〜60%圏内）に修正 */
+    .spot-1 { top: 35%; left: 33%; }
+    .spot-2 { top: 30%; left: 58%; }
+    .spot-3 { top: 60%; left: 30%; }
+    .spot-4 { top: 56%; left: 60%; }
 
     .deco-object {
       position: absolute;
@@ -242,24 +249,24 @@
       will-change: transform, filter, opacity;
       transition: filter 0.3s ease, opacity 0.3s ease;
     }
-    .obj-1 { top: 15%; left: 15%; width: 70px; height: 70px; background: rgba(255,0,127,0.15); border: 1px solid #ff007f; transform: rotate(15deg); }
-    .obj-2 { top: 12%; left: 82%; width: 80px; height: 80px; background: rgba(0,242,254,0.15); border: 1px solid #00f2fe; border-radius: 50%; }
-    .obj-3 { top: 82%; left: 12%; width: 60px; height: 60px; background: rgba(255,204,0,0.15); border: 1px solid #ffcc00; transform: rotate(-25deg); }
-    .obj-4 { top: 85%; left: 82%; width: 90px; height: 60px; background: rgba(121,40,202,0.15); border: 1px solid #7928ca; border-radius: 30px; }
+    .obj-1 { top: 22%; left: 20%; width: 60px; height: 60px; background: rgba(255,0,127,0.15); border: 1px solid #ff007f; transform: rotate(15deg); }
+    .obj-2 { top: 18%; left: 75%; width: 70px; height: 70px; background: rgba(0,242,254,0.15); border: 1px solid #00f2fe; border-radius: 50%; }
+    .obj-3 { top: 75%; left: 20%; width: 50px; height: 50px; background: rgba(255,204,0,0.15); border: 1px solid #ffcc00; transform: rotate(-25deg); }
+    .obj-4 { top: 78%; left: 76%; width: 80px; height: 50px; background: rgba(121,40,202,0.15); border: 1px solid #7928ca; border-radius: 30px; }
 
     .fg-obj {
       position: absolute;
-      font-size: 5rem;
+      font-size: 4rem;
       opacity: 0.6;
       filter: blur(2px);
       pointer-events: none;
       transition: opacity 0.3s ease, filter 0.3s ease;
       will-change: transform, opacity, filter;
     }
-    .fg-1 { top: 20%; left: 42%; }
-    .fg-2 { top: 62%; left: 48%; }
-    .fg-3 { top: 40%; left: 18%; }
-    .fg-4 { top: 50%; left: 80%; }
+    .fg-1 { top: 25%; left: 45%; }
+    .fg-2 { top: 60%; left: 48%; }
+    .fg-3 { top: 40%; left: 22%; }
+    .fg-4 { top: 48%; left: 75%; }
 
     .hud-menu-container {
       position: fixed;
@@ -329,7 +336,7 @@
 
       <div class="center-title js-depth-1">
         <h1>薩摩川内<br>看板探訪MAP</h1>
-        <p>ポインタ位置を中心にホイールズーム<br>ドラッグ / ホバーで移動</p>
+        <p>ドラッグで移動 / ホイールでポインタズーム<br>⚙️ボタンで設定展開</p>
       </div>
 
       <div class="deco-object obj-1 js-depth-2">🎲</div>
@@ -451,7 +458,7 @@
       themeBtn.innerText = isDayMode ? '☀️' : '🌙';
     });
 
-    // 座標・スケール管理
+    // 座標・スケール管理（目標値と現在値）
     let currentX = 0, currentY = 0, targetX = 0, targetY = 0;
     let currentScale = 1, targetScale = 1;
 
@@ -478,33 +485,36 @@
       return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
     }
 
-    // --- PC用機能: マウスポインタ位置を中心としたズーム処理 ---
+    // --- 【修正】マウスポインタ位置を中心にした正確なホイールズーム ---
     viewport.addEventListener('wheel', (e) => {
       e.preventDefault();
       
-      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
-      const newScale = Math.max(0.4, Math.min(2.5, targetScale * zoomFactor));
+      // ズーム感度の調整（0.5倍 〜 1.8倍に収めることで見切れを防止）
+      const zoomFactor = e.deltaY < 0 ? 1.12 : 0.89;
+      const newScale = Math.max(0.5, Math.min(1.8, targetScale * zoomFactor));
       
-      // 画面中央を原点(0,0)とした現在のマウスカーソル相対座標
-      const mouseX = e.clientX - window.innerWidth / 2;
-      const mouseY = e.clientY - window.innerHeight / 2;
+      if (newScale === targetScale) return;
 
-      // 拡大率の変化比率に基づいてターゲット座標をシフトさせる
-      const scaleRatio = newScale / targetScale;
-      targetX = mouseX - (mouseX - targetX) * scaleRatio;
-      targetY = mouseY - (mouseY - targetY) * scaleRatio;
+      // ビューポート中心からのマウス座標オフセットを計算
+      const rect = viewport.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left - rect.width / 2;
+      const mouseY = e.clientY - rect.top - rect.height / 2;
+
+      // 拡大比率からターゲット座標を補正（ポインタ直下を支点にする）
+      const ratio = newScale / targetScale;
+      targetX = mouseX - (mouseX - targetX) * ratio;
+      targetY = mouseY - (mouseY - targetY) * ratio;
+
+      // 移動制限（マップの外に飛び出さないガード）
+      targetX = Math.max(-800, Math.min(800, targetX));
+      targetY = Math.max(-800, Math.min(800, targetY));
 
       targetScale = newScale;
       lastX = targetX;
       lastY = targetY;
     }, { passive: false });
 
-    // PC用: ドラッグ兼マウスホバー追従処理
-    window.addEventListener('mousemove', (e) => {
-      if (e.buttons === 1) addFog(e.clientX, e.clientY);
-    });
-
-    // タッチ・ドラッグ操作
+    // --- タッチ ＆ マウスドラッグ共通ロジック ---
     viewport.addEventListener('touchstart', (e) => {
       for (let i = 0; i < e.touches.length; i++) addFog(e.touches[i].clientX, e.touches[i].clientY);
 
@@ -525,11 +535,11 @@
       if (e.touches.length === 1 && isDragging) {
         targetX = e.touches[0].clientX - startX;
         targetY = e.touches[0].clientY - startY;
-        targetX = Math.max(-1000, Math.min(1000, targetX));
-        targetY = Math.max(-1000, Math.min(1000, targetY));
+        targetX = Math.max(-800, Math.min(800, targetX));
+        targetY = Math.max(-800, Math.min(800, targetY));
       } else if (e.touches.length === 2 && initialPinchDistance) {
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
-        targetScale = Math.max(0.4, Math.min(2.5, initialScale * (currentDistance / initialPinchDistance)));
+        targetScale = Math.max(0.5, Math.min(1.8, initialScale * (currentDistance / initialPinchDistance)));
       }
     }, { passive: true });
 
@@ -542,8 +552,9 @@
       }
     });
 
-    // マウスドラッグ対応（PC）
+    // PC用マウスドラッグ
     viewport.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return; // 左クリックのみ
       isDragging = true;
       startX = e.clientX - lastX;
       startY = e.clientY - lastY;
@@ -553,9 +564,10 @@
       if (isDragging) {
         targetX = e.clientX - startX;
         targetY = e.clientY - startY;
-        targetX = Math.max(-1000, Math.min(1000, targetX));
-        targetY = Math.max(-1000, Math.min(1000, targetY));
+        targetX = Math.max(-800, Math.min(800, targetX));
+        targetY = Math.max(-800, Math.min(800, targetY));
       }
+      if (e.buttons === 1) addFog(e.clientX, e.clientY);
     });
 
     window.addEventListener('mouseup', () => {
@@ -572,37 +584,40 @@
 
     // メイン描画ループ
     function animate() {
-      currentX += (targetX - currentX) * 0.1;
-      currentY += (targetY - currentY) * 0.1;
-      currentScale += (targetScale - currentScale) * 0.1;
+      // イージングによるスムーズな補間
+      currentX += (targetX - currentX) * 0.12;
+      currentY += (targetY - currentY) * 0.12;
+      currentScale += (targetScale - currentScale) * 0.12;
 
-      // 広くなった階層レイヤーのパララックス計算
-      paraBg.style.transform = `translate(calc(-50% + ${currentX * 0.3}px), calc(-50% + ${currentY * 0.3}px)) scale(${currentScale * 0.7})`;
+      // 視差（パララックス）の適用
+      paraBg.style.transform = `translate(calc(-50% + ${currentX * 0.3}px), calc(-50% + ${currentY * 0.3}px)) scale(${currentScale * 0.85})`;
       world.style.transform = `translate(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px)) scale(${currentScale})`;
-      paraFg.style.transform = `translate(calc(-50% + ${currentX * 1.8}px), calc(-50% + ${currentY * 1.8}px)) scale(${currentScale * 1.4})`;
+      paraFg.style.transform = `translate(calc(-50% + ${currentX * 1.5}px), calc(-50% + ${currentY * 1.5}px)) scale(${currentScale * 1.25})`;
 
-      // 手前要素の切り捨て（カメラ通過非表示処理）
+      // カメラ通過時の最手前オブジェクト非表示処理
       fgItems.forEach(item => {
-        if (currentScale > 1.25) {
+        if (currentScale > 1.3) {
           item.style.opacity = '0';
-          item.style.filter = 'blur(12px)';
+          item.style.filter = 'blur(10px)';
         } else {
-          const progress = Math.max(0, (currentScale - 0.5) / 0.75);
-          item.style.opacity = `${(1 - progress) * 0.7}`;
-          item.style.filter = `blur(${2 + progress * 8}px)`;
+          const progress = Math.max(0, (currentScale - 0.5) / 0.8);
+          item.style.opacity = `${(1 - progress) * 0.6}`;
+          item.style.filter = `blur(${2 + progress * 6}px)`;
         }
       });
 
-      // 3段階深度の被写界深度（ぼかし）制御
-      if (currentScale < 0.75) {
+      // ズーム判定と被写界深度（ぼかし）・詳細解禁の制御
+      if (currentScale < 0.8) {
+        // 【1階層目：全域】広域バッジ・タイトルメイン
         depth1Elems.forEach(el => { el.style.filter = 'blur(0px)'; el.style.opacity = '1'; });
         depth2Elems.forEach(el => { el.style.filter = 'blur(2px)'; el.style.opacity = '0.6'; });
         depth23Cards.forEach(card => {
-          card.style.filter = 'blur(6px)';
-          card.style.opacity = '0.35';
+          card.style.filter = 'blur(5px)';
+          card.style.opacity = '0.4';
           card.classList.remove('is-deep-detail');
         });
-      } else if (currentScale >= 0.75 && currentScale < 1.35) {
+      } else if (currentScale >= 0.8 && currentScale < 1.25) {
+        // 【2階層目：中域】カード概要ピント合わせ
         depth1Elems.forEach(el => { el.style.filter = 'blur(4px)'; el.style.opacity = '0.3'; });
         depth2Elems.forEach(el => { el.style.filter = 'blur(0px)'; el.style.opacity = '1'; });
         depth23Cards.forEach(card => {
@@ -611,7 +626,8 @@
           card.classList.remove('is-deep-detail');
         });
       } else {
-        depth1Elems.forEach(el => { el.style.filter = 'blur(10px)'; el.style.opacity = '0.1'; });
+        // 【3階層目：詳細】コア情報（コメント・寸法）の展开展現
+        depth1Elems.forEach(el => { el.style.filter = 'blur(8px)'; el.style.opacity = '0.1'; });
         depth2Elems.forEach(el => { el.style.filter = 'blur(3px)'; el.style.opacity = '0.7'; });
         depth23Cards.forEach(card => {
           card.style.filter = 'blur(0px)';
@@ -620,7 +636,7 @@
         });
       }
 
-      // 霧エフェクトの描画
+      // 霧エフェクト描画
       ctx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
       for (let i = fogParticles.length - 1; i >= 0; i--) {
         const p = fogParticles[i];
