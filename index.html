@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>薩摩川内 街角看板探訪マップ</title>
+  <style>
+    /* スマホ向け全画面バウンス防止・基本設定 */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0d0f12;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #fff;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none; /* スクロール等のデフォルト動作を無効化 */
+    }
+
+    .viewport {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 探索可能な広大マップ（スマホサイズに対して大きく設定） */
+    .world {
+      position: absolute;
+      width: 1800px;
+      height: 1800px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      /* 川内街歩きをイメージしたグリッド背景 */
+      background-image: 
+        radial-gradient(circle, rgba(255,204,0,0.2) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 30px 30px, 60px 60px, 60px 60px;
+      will-change: transform;
+    }
+
+    /* マップ中央のタイトルエリア */
+    .center-title {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+      width: 280px;
+    }
+
+    .center-title h1 {
+      font-size: 1.8rem;
+      letter-spacing: 0.05em;
+      margin: 0 0 8px 0;
+      color: #ffcc00;
+      text-shadow: 0 0 10px rgba(255,204,0,0.5);
+    }
+
+    .center-title p {
+      color: #aaa;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    /* 店舗の看板カード */
+    .signboard-card {
+      position: absolute;
+      width: 200px;
+      padding: 16px;
+      background: rgba(22, 27, 34, 0.85);
+      border: 1px solid rgba(255, 204, 0, 0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      will-change: transform;
+      transition: border-color 0.2s, transform 0.1s ease-out;
+    }
+
+    .signboard-card:active {
+      border-color: #ffcc00;
+      transform: scale(0.96) !important;
+    }
+
+    .signboard-img {
+      width: 100%;
+      height: 120px;
+      background-color: #222;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .signboard-card h3 {
+      margin: 0 0 4px 0;
+      font-size: 1rem;
+      color: #fff;
+    }
+
+    .signboard-card .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      background-color: rgba(255, 204, 0, 0.15);
+      color: #ffcc00;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .signboard-card p {
+      margin: 0;
+      font-size: 0.75rem;
+      color: #ccc;
+      line-height: 1.4;
+    }
+
+    /* マップ上の配置座標 */
+    .spot-1 { top: 38%; left: 35%; }
+    .spot-2 { top: 30%; left: 62%; }
+    .spot-3 { top: 62%; left: 32%; }
+    .spot-4 { top: 58%; left: 65%; }
+
+    /* スマホ操作用UI（現在地に戻るボタン等） */
+    .hud-controls {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 100;
+    }
+
+    .btn-recenter {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #ffcc00;
+      color: #000;
+      border: none;
+      font-weight: bold;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 16px rgba(255,204,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="viewport" id="viewport">
+    <div class="world" id="world">
+      
+      <!-- 中央タイトル -->
+      <div class="center-title">
+        <h1>薩摩川内<br>看板探訪MAP</h1>
+        <p>指でドラッグして街を散策<br>気になる看板をタップしてみよう</p>
+      </div>
+
+      <!-- 店舗看板カード1 -->
+      <div class="signboard-card spot-1 js-card" data-lat="31.815" data-lng="130.302">
+        <div class="signboard-img" style="background: linear-gradient(135deg, #ff5e62, #ff9966); display: flex; align-items: center; justify-content: center; font-weight: bold;">レトロ居酒屋</div>
+        <span class="tag">向田本町エリア</span>
+        <h3>昭和風情のネオン看板</h3>
+        <p>夜になると味わい深い光を放つ、創業40年の老舗居酒屋のシンボル。</p>
+      </div>
+
+      <!-- 店舗看板カード2 -->
+      <div class="signboard-card spot-2 js-card">
+        <div class="signboard-img" style="background: linear-gradient(135deg, #42e695, #3bb2b8); display: flex; align-items: center; justify-content: center; font-weight: bold;">モダンカフェ</div>
+        <span class="tag">川内駅前エリア</span>
+        <h3>鉄文字のシンプル看板</h3>
+        <p>昼の光と夜の影で表情が変わる、スタイリッシュな切り文字デザイン。</p>
+      </div>
+
+      <!-- 店舗看板カード3 -->
+      <div class="signboard-card spot-3 js-card">
+        <div class="signboard-img" style="background: linear-gradient(135deg, #f857a6, #ff5858); display: flex; align-items: center; justify-content: center; font-weight: bold;">うなぎ専門店</div>
+        <span class="tag">国道沿いエリア</span>
+        <h3>木彫り墨文字看板</h3>
+        <p>重厚感あふれる一枚板に手書きされた、歴史を感じる職人技の看板。</p>
+      </div>
+
+      <!-- 店舗看板カード4 -->
+      <div class="signboard-card spot-4 js-card">
+        <div class="signboard-img" style="background: linear-gradient(135deg, #abecd6, #fbed96); color:#333; display: flex; align-items: center; justify-content: center; font-weight: bold;">スイーツショップ</div>
+        <span class="tag">山形屋周辺</span>
+        <h3>手書きイラスト看板</h3>
+        <p>季節ごとに描き直される、アットホームなスタンド型のイラスト板。</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="hud-controls">
+    <button class="btn-recenter" id="recenterBtn">🎯</button>
+  </div>
+
+  <script>
+    const viewport = document.getElementById('viewport');
+    const world = document.getElementById('world');
+    const cards = document.querySelectorAll('.js-card');
+    const recenterBtn = document.getElementById('recenterBtn');
+
+    // マップ座標管理
+    let currentX = 0;
+    let currentY = 0;
+    let targetX = 0;
+    let targetY = 0;
+
+    // タッチ操作管理
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let lastX = 0;
+    let lastY = 0;
+
+    // 傾き（ジャイロ）管理
+    let tiltX = 0;
+    let tiltY = 0;
+
+    // タッチ開始
+    viewport.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      startX = e.touches[0].clientX - lastX;
+      startY = e.touches[0].clientY - lastY;
+    }, { passive: true });
+
+    // タッチ移動（ドラッグでマップをスクロール）
+    viewport.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      targetX = e.touches[0].clientX - startX;
+      targetY = e.touches[0].clientY - startY;
+
+      // 移動制限（マップの外に出すぎないようにガード）
+      targetX = Math.max(-600, Math.min(600, targetX));
+      targetY = Math.max(-600, Math.min(600, targetY));
+    }, { passive: true });
+
+    // タッチ終了
+    viewport.addEventListener('touchend', () => {
+      isDragging = false;
+      lastX = targetX;
+      lastY = targetY;
+    });
+
+    // 中央に戻すボタン
+    recenterBtn.addEventListener('click', () => {
+      targetX = 0;
+      targetY = 0;
+      lastX = 0;
+      lastY = 0;
+    });
+
+    // ジャイロセンサー（スマホの傾き検知）
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', (e) => {
+        // gamma: 左右の傾き (-90 ~ 90), beta: 上下の傾き (-180 ~ 180)
+        if (e.gamma !== null && e.beta !== null) {
+          tiltX = Math.max(-30, Math.min(30, e.gamma)) * 0.5; // パララックス効果用
+          tiltY = Math.max(-30, Math.min(30, e.beta - 45)) * 0.5;
+        }
+      });
+    }
+
+    // カードをタップした時の拡大・詳細表示用イベント
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        const title = card.querySelector('h3').innerText;
+        alert(`「${title}」の看板詳細・店舗アクセス画面へ移動します（実装予定）`);
+      });
+    });
+
+    // メインアニメーションループ（イージング＋パララックス）
+    function animate() {
+      // スムース補間（ドラッグ追従）
+      currentX += (targetX - currentX) * 0.1;
+      currentY += (targetY - currentY) * 0.1;
+
+      // ワールド全体の移動（ジャイロの傾き効果も微量加算）
+      const totalX = currentX + tiltX;
+      const totalY = currentY + tiltY;
+
+      world.style.transform = `translate(calc(-50% + ${totalX}px), calc(-50% + ${totalY}px))`;
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
