@@ -282,3 +282,371 @@
       width: 52px;
       height: 52px;
       border-radius: 50%;
+      background: #ffcc00;
+      color: #000;
+      border: none;
+      font-size: 1.3rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
+    }
+
+    .btn-hud:active { transform: scale(0.9); }
+    body.day-mode .btn-hud { background: #0077ff; color: #fff; }
+
+    .sub-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px) scale(0.8);
+      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .hud-menu-container.is-open .sub-menu {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .hud-menu-container.is-open #menuToggleBtn {
+      transform: rotate(45deg);
+      background: #ff3366;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="viewport" id="viewport">
+    <canvas id="fogCanvas"></canvas>
+
+    <!-- 遠景 -->
+    <div class="parallax-bg" id="paraBg"></div>
+
+    <!-- 中景 -->
+    <div class="world" id="world">
+      <div class="area-badge area-1 js-depth-1">向田本町エリア 🏮</div>
+      <div class="area-badge area-2 js-depth-1">川内駅前エリア 🚄</div>
+      <div class="area-badge area-3 js-depth-1">国道沿いエリア 🚗</div>
+      <div class="area-badge area-4 js-depth-1">山形屋周辺エリア 🛍️</div>
+
+      <div class="center-title js-depth-1">
+        <h1>薩摩川内<br>看板探訪MAP</h1>
+        <p>マウスホバー / ドラッグで移動<br>ホイール / ピンチで階層ズーム</p>
+      </div>
+
+      <div class="deco-object obj-1 js-depth-2">🎲</div>
+      <div class="deco-object obj-2 js-depth-2">💍</div>
+      <div class="deco-object obj-3 js-depth-2">💎</div>
+      <div class="deco-object obj-4 js-depth-2">🔮</div>
+
+      <div class="signboard-card spot-1 js-depth-23 js-card">
+        <div class="signboard-img">
+          <img src="https://via.placeholder.com/300x160/ff007f/ffffff?text=Izakaya+Neon" alt="仮画像">
+        </div>
+        <span class="tag">向田本町エリア</span>
+        <h3>昭和風情のネオン看板</h3>
+        <div class="detail-info">
+          <p>「40年間、向田の夜を照らし続けてきた自慢のネオン管です」</p>
+          <div class="detail-spec">
+            <span>寸法: 120cm×80cm</span>
+            <span>夜間点灯: 18:00〜</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="signboard-card spot-2 js-depth-23 js-card">
+        <div class="signboard-img">
+          <img src="https://via.placeholder.com/300x160/00f2fe/ffffff?text=Cafe+Sign" alt="仮画像">
+        </div>
+        <span class="tag">川内駅前エリア</span>
+        <h3>鉄文字のシンプル看板</h3>
+        <div class="detail-info">
+          <p>「太陽の角度によって影の伸び方が変わる立体切り文字仕様。」</p>
+          <div class="detail-spec">
+            <span>素材: アイアン鋼</span>
+            <span>設置: 2021年</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="signboard-card spot-3 js-depth-23 js-card">
+        <div class="signboard-img">
+          <img src="https://via.placeholder.com/300x160/f857a6/ffffff?text=Kappo+Wood" alt="仮画像">
+        </div>
+        <span class="tag">国道沿いエリア</span>
+        <h3>木彫り墨文字看板</h3>
+        <div class="detail-info">
+          <p>「樹齢100年の屋久杉一枚板に地元の書道家が揮毫した逸品。」</p>
+          <div class="detail-spec">
+            <span>重量: 約25kg</span>
+            <span>漆塗り仕上げ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="signboard-card spot-4 js-depth-23 js-card">
+        <div class="signboard-img">
+          <img src="https://via.placeholder.com/300x160/ff8008/ffffff?text=Sweets+Art" alt="仮画像">
+        </div>
+        <span class="tag">山形屋周辺</span>
+        <h3>手書きイラスト看板</h3>
+        <div class="detail-info">
+          <p>「月替わりで店主が手描きするチョークアートスタンド。」</p>
+          <div class="detail-spec">
+            <span>更新: 毎月1日</span>
+            <span>手書き黒板</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 近景（手前） -->
+    <div class="parallax-fg" id="paraFg">
+      <div class="fg-obj fg-1 js-fg-item">✨</div>
+      <div class="fg-obj fg-2 js-fg-item">🌟</div>
+      <div class="fg-obj fg-3 js-fg-item">💠</div>
+      <div class="fg-obj fg-4 js-fg-item">⚡</div>
+    </div>
+  </div>
+
+  <div class="hud-menu-container" id="menuContainer">
+    <button class="btn-hud" id="menuToggleBtn">⚙️</button>
+    <div class="sub-menu">
+      <button class="btn-hud" id="themeBtn" title="昼夜切替">🌙</button>
+      <button class="btn-hud" id="recenterBtn" title="視点リセット">🎯</button>
+    </div>
+  </div>
+
+  <script>
+    const viewport = document.getElementById('viewport');
+    const world = document.getElementById('world');
+    const paraBg = document.getElementById('paraBg');
+    const paraFg = document.getElementById('paraFg');
+    const fogCanvas = document.getElementById('fogCanvas');
+    const ctx = fogCanvas.getContext('2d');
+
+    const menuContainer = document.getElementById('menuContainer');
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const recenterBtn = document.getElementById('recenterBtn');
+    const themeBtn = document.getElementById('themeBtn');
+
+    const depth1Elems = document.querySelectorAll('.js-depth-1');
+    const depth2Elems = document.querySelectorAll('.js-depth-2');
+    const depth23Cards = document.querySelectorAll('.js-depth-23');
+    const fgItems = document.querySelectorAll('.js-fg-item');
+
+    let isDayMode = false;
+
+    function resizeCanvas() {
+      fogCanvas.width = window.innerWidth;
+      fogCanvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    menuToggleBtn.addEventListener('click', () => {
+      menuContainer.classList.toggle('is-open');
+    });
+
+    themeBtn.addEventListener('click', () => {
+      isDayMode = !isDayMode;
+      document.body.classList.toggle('day-mode', isDayMode);
+      themeBtn.innerText = isDayMode ? '☀️' : '🌙';
+    });
+
+    // 座標・スケール管理
+    let currentX = 0, currentY = 0, targetX = 0, targetY = 0;
+    let currentScale = 1, targetScale = 1;
+    let mouseHoverX = 0, mouseHoverY = 0;
+
+    let isDragging = false;
+    let startX = 0, startY = 0, lastX = 0, lastY = 0;
+    let initialPinchDistance = null, initialScale = 1;
+
+    const fogParticles = [];
+
+    function addFog(x, y) {
+      for (let i = 0; i < 2; i++) {
+        fogParticles.push({
+          x: x + (Math.random() - 0.5) * 20,
+          y: y + (Math.random() - 0.5) * 20,
+          radius: 20 + Math.random() * 25,
+          alpha: 0.22,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4 - 0.2
+        });
+      }
+    }
+
+    function getDistance(t1, t2) {
+      return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+    }
+
+    // --- PC用機能: マウスホイール拡大縮小 ---
+    viewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+      targetScale = Math.max(0.4, Math.min(2.5, targetScale * zoomFactor));
+    }, { passive: false });
+
+    // --- PC用機能: マウス位置による自動追従スクロール ---
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) {
+        // 画面中央を (0,0) とした normalized 座標 (-1 〜 1)
+        const normX = (e.clientX / window.innerWidth - 0.5) * 2;
+        const normY = (e.clientY / window.innerHeight - 0.5) * 2;
+        // マウス位置に応じた引き寄せオフセット（最大400px）
+        mouseHoverX = -normX * 400;
+        mouseHoverY = -normY * 400;
+      }
+      if (e.buttons === 1) addFog(e.clientX, e.clientY);
+    });
+
+    // タッチ・ドラッグ操作
+    viewport.addEventListener('touchstart', (e) => {
+      for (let i = 0; i < e.touches.length; i++) addFog(e.touches[i].clientX, e.touches[i].clientY);
+
+      if (e.touches.length === 1) {
+        isDragging = true;
+        startX = e.touches[0].clientX - lastX;
+        startY = e.touches[0].clientY - lastY;
+      } else if (e.touches.length === 2) {
+        isDragging = false;
+        initialPinchDistance = getDistance(e.touches[0], e.touches[1]);
+        initialScale = targetScale;
+      }
+    }, { passive: true });
+
+    viewport.addEventListener('touchmove', (e) => {
+      for (let i = 0; i < e.touches.length; i++) addFog(e.touches[i].clientX, e.touches[i].clientY);
+
+      if (e.touches.length === 1 && isDragging) {
+        targetX = e.touches[0].clientX - startX;
+        targetY = e.touches[0].clientY - startY;
+        targetX = Math.max(-1000, Math.min(1000, targetX));
+        targetY = Math.max(-1000, Math.min(1000, targetY));
+      } else if (e.touches.length === 2 && initialPinchDistance) {
+        const currentDistance = getDistance(e.touches[0], e.touches[1]);
+        targetScale = Math.max(0.4, Math.min(2.5, initialScale * (currentDistance / initialPinchDistance)));
+      }
+    }, { passive: true });
+
+    viewport.addEventListener('touchend', (e) => {
+      if (e.touches.length < 2) initialPinchDistance = null;
+      if (e.touches.length === 0) {
+        isDragging = false;
+        lastX = targetX;
+        lastY = targetY;
+      }
+    });
+
+    recenterBtn.addEventListener('click', () => {
+      targetX = 0; targetY = 0; lastX = 0; lastY = 0; targetScale = 1; mouseHoverX = 0; mouseHoverY = 0;
+    });
+
+    // メイン描画ループ
+    function animate() {
+      // マウス位置追従とドラッグ座標を合成
+      const finalTargetX = targetX + mouseHoverX;
+      const finalTargetY = targetY + mouseHoverY;
+
+      currentX += (finalTargetX - currentX) * 0.08;
+      currentY += (finalTargetY - currentY) * 0.08;
+      currentScale += (targetScale - currentScale) * 0.1;
+
+      // 広くなった階層レイヤーのパララックス計算
+      // 遠景（背景）
+      paraBg.style.transform = `translate(calc(-50% + ${currentX * 0.3}px), calc(-50% + ${currentY * 0.3}px)) scale(${currentScale * 0.7})`;
+      // 中景（メインマップ）
+      world.style.transform = `translate(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px)) scale(${currentScale})`;
+      // 近景（手前）
+      paraFg.style.transform = `translate(calc(-50% + ${currentX * 1.8}px), calc(-50% + ${currentY * 1.8}px)) scale(${currentScale * 1.4})`;
+
+      // --- 手前要素の切り捨て（カメラを通り過ぎたら消す処理） ---
+      fgItems.forEach(item => {
+        // スケールが1.25を超えて寄った場合、カメラを追い越したとみなして消去
+        if (currentScale > 1.25) {
+          item.style.opacity = '0';
+          item.style.filter = 'blur(12px)';
+        } else {
+          // ズームに応じた透明度とぼかしの連続変化
+          const progress = Math.max(0, (currentScale - 0.5) / 0.75); // 0〜1
+          item.style.opacity = `${(1 - progress) * 0.7}`;
+          item.style.filter = `blur(${2 + progress * 8}px)`;
+        }
+      });
+
+      // 階層（3段階深度）の表示制御
+      if (currentScale < 0.75) {
+        // 1階層目（広域）
+        depth1Elems.forEach(el => { el.style.filter = 'blur(0px)'; el.style.opacity = '1'; });
+        depth2Elems.forEach(el => { el.style.filter = 'blur(2px)'; el.style.opacity = '0.6'; });
+        depth23Cards.forEach(card => {
+          card.style.filter = 'blur(6px)';
+          card.style.opacity = '0.35';
+          card.classList.remove('is-deep-detail');
+        });
+      } else if (currentScale >= 0.75 && currentScale < 1.35) {
+        // 2階層目（標準）
+        depth1Elems.forEach(el => { el.style.filter = 'blur(4px)'; el.style.opacity = '0.3'; });
+        depth2Elems.forEach(el => { el.style.filter = 'blur(0px)'; el.style.opacity = '1'; });
+        depth23Cards.forEach(card => {
+          card.style.filter = 'blur(0px)';
+          card.style.opacity = '1';
+          card.classList.remove('is-deep-detail');
+        });
+      } else {
+        // 3階層目（詳細解禁）
+        depth1Elems.forEach(el => { el.style.filter = 'blur(10px)'; el.style.opacity = '0.1'; });
+        depth2Elems.forEach(el => { el.style.filter = 'blur(3px)'; el.style.opacity = '0.7'; });
+        depth23Cards.forEach(card => {
+          card.style.filter = 'blur(0px)';
+          card.style.opacity = '1';
+          card.classList.add('is-deep-detail');
+        });
+      }
+
+      // 霧アニメーション
+      ctx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
+      for (let i = fogParticles.length - 1; i >= 0; i--) {
+        const p = fogParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.radius += 0.4;
+        p.alpha -= 0.005;
+
+        if (p.alpha <= 0) {
+          fogParticles.splice(i, 1);
+          continue;
+        }
+
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+        if (isDayMode) {
+          grad.addColorStop(0, `rgba(160, 230, 255, ${p.alpha})`);
+          grad.addColorStop(0.6, `rgba(0, 150, 255, ${p.alpha * 0.4})`);
+          grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        } else {
+          grad.addColorStop(0, `rgba(255, 0, 150, ${p.alpha})`);
+          grad.addColorStop(0.6, `rgba(255, 0, 100, ${p.alpha * 0.4})`);
+          grad.addColorStop(1, 'rgba(255, 0, 150, 0)');
+        }
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
