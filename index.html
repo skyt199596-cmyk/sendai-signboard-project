@@ -6,7 +6,7 @@
   <title>薩摩川内 街角看板探訪マップ</title>
   <style>
     :root {
-      --bg-color: #0d0f12;
+      --bg-color: #0c0e12;
       --card-bg: rgba(22, 27, 34, 0.85);
       --card-border: rgba(255, 204, 0, 0.3);
       --text-main: #ffffff;
@@ -14,10 +14,9 @@
       --grid-color: rgba(255,255,255,0.03);
     }
 
-    /* 昼モードのテーマ変数 */
     body.day-mode {
       --bg-color: #eef2f5;
-      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-bg: rgba(255, 255, 255, 0.88);
       --card-border: rgba(0, 150, 255, 0.3);
       --text-main: #1a1a1a;
       --text-sub: #555555;
@@ -56,18 +55,44 @@
       z-index: 50;
     }
 
-    .world {
+    /* パララックス背景層（遠景） */
+    .parallax-bg {
       position: absolute;
-      width: 1800px;
-      height: 1800px;
+      width: 2200px;
+      height: 2200px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background-image: 
-        radial-gradient(circle, rgba(255,204,0,0.2) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,204,0,0.15) 1px, transparent 1px),
         linear-gradient(var(--grid-color) 1px, transparent 1px),
         linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-      background-size: 30px 30px, 60px 60px, 60px 60px;
+      background-size: 40px 40px, 80px 80px, 80px 80px;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    /* メインマップ層（中景） */
+    .world {
+      position: absolute;
+      width: 2000px;
+      height: 2000px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      will-change: transform;
+    }
+
+    /* パララックス近景層（前景） */
+    .parallax-fg {
+      position: absolute;
+      width: 2000px;
+      height: 2000px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 40;
       will-change: transform;
     }
 
@@ -78,92 +103,100 @@
       transform: translate(-50%, -50%);
       text-align: center;
       pointer-events: none;
-      width: 280px;
+      width: 300px;
+      transition: filter 0.3s, opacity 0.3s;
     }
 
     .center-title h1 {
-      font-size: clamp(1.4rem, 4vw, 1.8rem);
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
       letter-spacing: 0.05em;
       margin: 0 0 8px 0;
       color: #ffcc00;
-      text-shadow: 0 0 10px rgba(255,204,0,0.5);
-      transition: color 0.5s;
+      text-shadow: 0 0 12px rgba(255,204,0,0.5);
     }
 
     body.day-mode .center-title h1 {
       color: #0077ff;
-      text-shadow: 0 0 10px rgba(0,119,255,0.3);
+      text-shadow: 0 0 12px rgba(0,119,255,0.3);
     }
 
-    .center-title p {
-      color: var(--text-sub);
-      font-size: 0.85rem;
-      line-height: 1.4;
+    /* 1階層目：エリア抽象広域表示アイコン */
+    .area-badge {
+      position: absolute;
+      padding: 12px 24px;
+      background: rgba(255, 204, 0, 0.15);
+      border: 2px solid #ffcc00;
+      border-radius: 40px;
+      color: #ffcc00;
+      font-weight: bold;
+      font-size: 1.1rem;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 20px rgba(255,204,0,0.3);
+      transition: filter 0.3s ease, opacity 0.3s ease;
+      pointer-events: none;
     }
 
-    /* レスポンシブなカード定義 */
+    body.day-mode .area-badge {
+      background: rgba(0, 119, 255, 0.15);
+      border-color: #0077ff;
+      color: #0077ff;
+    }
+
+    .area-1 { top: 32%; left: 30%; }
+    .area-2 { top: 25%; left: 60%; }
+    .area-3 { top: 65%; left: 28%; }
+    .area-4 { top: 62%; left: 62%; }
+
+    /* 看板カード基本スタイル */
     .signboard-card {
       position: absolute;
-      width: clamp(170px, 45vw, 220px);
+      width: clamp(180px, 45vw, 230px);
       padding: 16px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      border-radius: 16px;
+      border-radius: 18px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-      will-change: transform;
-      transition: border-color 0.3s, background 0.5s, box-shadow 0.3s;
+      will-change: transform, filter, opacity;
+      transition: border-color 0.3s, background 0.5s, box-shadow 0.3s, filter 0.3s ease, opacity 0.3s ease;
       z-index: 10;
-    }
-
-    /* 夜モード時の発光効果 */
-    body:not(.day-mode) .signboard-card:hover,
-    body:not(.day-mode) .signboard-card:active {
-      border-color: #ff007f;
-      box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
-    }
-
-    /* 昼モード時の発光効果 */
-    body.day-mode .signboard-card:hover,
-    body.day-mode .signboard-card:active {
-      border-color: #00d4ff;
-      box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
     }
 
     .signboard-img {
       width: 100%;
       height: 110px;
-      border-radius: 8px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
       margin-bottom: 10px;
       transition: all 0.5s ease;
+      overflow: hidden;
+      position: relative;
     }
 
-    /* 夜のネオン演出風グラデーション */
-    .night-bg-1 { background: linear-gradient(135deg, #ff007f, #7928ca); color: #fff; text-shadow: 0 0 8px #fff; }
-    .night-bg-2 { background: linear-gradient(135deg, #00f2fe, #4facfe); color: #fff; text-shadow: 0 0 8px #fff; }
-    .night-bg-3 { background: linear-gradient(135deg, #f857a6, #ff5858); color: #fff; text-shadow: 0 0 8px #fff; }
-    .night-bg-4 { background: linear-gradient(135deg, #ff8008, #ffc837); color: #fff; text-shadow: 0 0 8px #fff; }
+    .signboard-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-    /* 昼の爽やかなグラデーション */
-    body.day-mode .night-bg-1 { background: linear-gradient(135deg, #a8edd9, #fed6e3); color: #333; text-shadow: none; }
-    body.day-mode .night-bg-2 { background: linear-gradient(135deg, #c2e9fb, #a1c4fd); color: #333; text-shadow: none; }
-    body.day-mode .night-bg-3 { background: linear-gradient(135deg, #fddb92, #d1fdff); color: #333; text-shadow: none; }
-    body.day-mode .night-bg-4 { background: linear-gradient(135deg, #e0c3fc, #8ec5fc); color: #333; text-shadow: none; }
+    .night-bg-1 { background: linear-gradient(135deg, #ff007f, #7928ca); color: #fff; }
+    .night-bg-2 { background: linear-gradient(135deg, #00f2fe, #4facfe); color: #fff; }
+    .night-bg-3 { background: linear-gradient(135deg, #f857a6, #ff5858); color: #fff; }
+    .night-bg-4 { background: linear-gradient(135deg, #ff8008, #ffc837); color: #fff; }
 
     .signboard-card h3 {
       margin: 0 0 4px 0;
-      font-size: 0.95rem;
+      font-size: 1rem;
       color: var(--text-main);
     }
 
     .signboard-card .tag {
       display: inline-block;
-      font-size: 0.68rem;
+      font-size: 0.7rem;
       padding: 2px 8px;
       background-color: rgba(255, 204, 0, 0.15);
       color: #ffcc00;
@@ -171,60 +204,99 @@
       margin-bottom: 8px;
     }
 
-    body.day-mode .signboard-card .tag {
-      background-color: rgba(0, 119, 255, 0.1);
-      color: #0077ff;
-    }
-
-    /* ズーム度合いで表示・非表示を切り替える詳細テキスト */
-    .signboard-card p {
-      margin: 0;
-      font-size: 0.75rem;
-      color: var(--text-sub);
-      line-height: 1.4;
-      opacity: 1;
-      max-height: 100px;
-      transition: opacity 0.3s ease, max-height 0.3s ease;
-      overflow: hidden;
-    }
-
-    /* ズームアウト（引いた視点）時に詳細文を隠すクラス */
-    .signboard-card.is-zoomed-out p {
+    /* 3階層目（拡大時）に展開するコア情報エリア */
+    .detail-info {
       opacity: 0;
       max-height: 0;
-      margin: 0;
+      overflow: hidden;
+      transition: opacity 0.4s ease, max-height 0.4s ease, margin-top 0.4s ease;
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      border-top: 1px stroke rgba(255,255,255,0.1);
     }
 
-    .spot-1 { top: 38%; left: 35%; }
-    .spot-2 { top: 30%; left: 62%; }
-    .spot-3 { top: 62%; left: 32%; }
-    .spot-4 { top: 58%; left: 65%; }
+    .detail-info p {
+      margin: 6px 0 0 0;
+      line-height: 1.4;
+    }
 
-    /* スマホ固定UI */
-    .hud-controls {
+    .detail-spec {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding: 6px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 6px;
+      font-size: 0.7rem;
+    }
+
+    /* ズーム3階層目の状態（詳細情報展開） */
+    .signboard-card.is-deep-detail .detail-info {
+      opacity: 1;
+      max-height: 200px;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .spot-1 { top: 35%; left: 32%; }
+    .spot-2 { top: 22%; left: 58%; }
+    .spot-3 { top: 62%; left: 26%; }
+    .spot-4 { top: 58%; left: 60%; }
+
+    /* にぎやか用 3Dライク・浮遊オブジェ */
+    .deco-object {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      border-radius: 12px;
+      will-change: transform, filter;
+      transition: filter 0.3s ease, opacity 0.3s ease;
+    }
+    .obj-1 { top: 20%; left: 20%; width: 60px; height: 60px; background: rgba(255,0,127,0.2); border: 1px solid #ff007f; transform: rotate(15deg); }
+    .obj-2 { top: 15%; left: 75%; width: 70px; height: 70px; background: rgba(0,242,254,0.2); border: 1px solid #00f2fe; border-radius: 50%; }
+    .obj-3 { top: 70%; left: 15%; width: 50px; height: 50px; background: rgba(255,204,0,0.2); border: 1px solid #ffcc00; transform: rotate(-25deg); }
+    .obj-4 { top: 75%; left: 78%; width: 80px; height: 50px; background: rgba(121,40,202,0.2); border: 1px solid #7928ca; border-radius: 30px; }
+
+    /* 手前（近景）の大型浮遊オブジェ */
+    .fg-obj {
+      position: absolute;
+      font-size: 3.5rem;
+      opacity: 0.4;
+      filter: blur(3px);
+      pointer-events: none;
+    }
+    .fg-1 { top: 25%; left: 45%; }
+    .fg-2 { top: 65%; left: 50%; }
+
+    /* 右下格納式メニューUI */
+    .hud-menu-container {
       position: fixed;
-      bottom: clamp(16px, 4vw, 24px);
-      right: clamp(16px, 4vw, 24px);
+      bottom: clamp(20px, 5vw, 30px);
+      right: clamp(20px, 5vw, 30px);
       z-index: 100;
       display: flex;
-      flex-direction: column;
+      flex-direction: column-reverse;
+      align-items: center;
       gap: 12px;
     }
 
     .btn-hud {
-      width: 48px;
-      height: 48px;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
       background: #ffcc00;
       color: #000;
       border: none;
-      font-size: 1.2rem;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      font-size: 1.3rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: transform 0.2s, background 0.3s;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
     }
 
     .btn-hud:active {
@@ -235,6 +307,30 @@
       background: #0077ff;
       color: #fff;
     }
+
+    /* 格納されるサブボタン群 */
+    .sub-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px) scale(0.8);
+      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* メニュー開状態 */
+    .hud-menu-container.is-open .sub-menu {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .hud-menu-container.is-open #menuToggleBtn {
+      transform: rotate(45deg);
+      background: #ff3366;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -242,59 +338,137 @@
   <div class="viewport" id="viewport">
     <canvas id="fogCanvas"></canvas>
 
+    <!-- 遠景：パララックス背景 -->
+    <div class="parallax-bg" id="paraBg"></div>
+
+    <!-- 中景：メインコンテンツ・カード・飾りオブジェ -->
     <div class="world" id="world">
-      <div class="center-title">
-        <h1 id="mainTitle">薩摩川内<br>看板探訪MAP</h1>
-        <p>ドラッグ＆ピンチで街を探索<br>☀️/🌙 ボタンで時間切替</p>
+
+      <!-- 1階層目（遠目）：エリア名バッジ -->
+      <div class="area-badge area-1 js-depth-1">向田本町エリア 🏮</div>
+      <div class="area-badge area-2 js-depth-1">川内駅前エリア 🚄</div>
+      <div class="area-badge area-3 js-depth-1">国道沿いエリア 🚗</div>
+      <div class="area-badge area-4 js-depth-1">山形屋周辺エリア 🛍️</div>
+
+      <!-- 中央タイトル -->
+      <div class="center-title js-depth-1">
+        <h1>薩摩川内<br>看板探訪MAP</h1>
+        <p>ピンチ操作で階層ズーム<br>⚙️ボタンでメニュー展開</p>
       </div>
 
-      <div class="signboard-card spot-1 js-card">
-        <div class="signboard-img night-bg-1" id="img1">居酒屋 ネオン</div>
+      <!-- にぎやか用飾りオブジェクト -->
+      <div class="deco-object obj-1 js-depth-2">🎲</div>
+      <div class="deco-object obj-2 js-depth-2">💍</div>
+      <div class="deco-object obj-3 js-depth-2">💎</div>
+      <div class="deco-object obj-4 js-depth-2">🔮</div>
+
+      <!-- 2〜3階層目：店舗看板カード -->
+      <div class="signboard-card spot-1 js-depth-23 js-card">
+        <div class="signboard-img night-bg-1">
+          <img src="https://via.placeholder.com/300x160/ff007f/ffffff?text=Izakaya+Neon" alt="仮画像">
+        </div>
         <span class="tag">向田本町エリア</span>
         <h3>昭和風情のネオン看板</h3>
-        <p>夜になると妖艶なピンク色に光を放つ、創業40年の老舗居酒屋のシンボル。</p>
+        
+        <!-- 3階層目（拡大時）で解禁されるコア情報 -->
+        <div class="detail-info">
+          <p>「40年間、向田の夜を照らし続けてきた自慢のネオン管です」</p>
+          <div class="detail-spec">
+            <span>寸法: 120cm×80cm</span>
+            <span>夜間点灯: 18:00〜</span>
+          </div>
+        </div>
       </div>
 
-      <div class="signboard-card spot-2 js-card">
-        <div class="signboard-img night-bg-2" id="img2">カフェ サイネージ</div>
+      <div class="signboard-card spot-2 js-depth-23 js-card">
+        <div class="signboard-img night-bg-2">
+          <img src="https://via.placeholder.com/300x160/00f2fe/ffffff?text=Cafe+Sign" alt="仮画像">
+        </div>
         <span class="tag">川内駅前エリア</span>
         <h3>鉄文字のシンプル看板</h3>
-        <p>昼の太陽光と夜の影で大きく表情が変わるスタイリッシュな切り文字デザイン。</p>
+        
+        <div class="detail-info">
+          <p>「太陽の角度によって影の伸び方が変わる立体切り文字仕様。」</p>
+          <div class="detail-spec">
+            <span>素材: アイアン鋼</span>
+            <span>設置: 2021年</span>
+          </div>
+        </div>
       </div>
 
-      <div class="signboard-card spot-3 js-card">
-        <div class="signboard-img night-bg-3" id="img3">割烹 銘木板</div>
+      <div class="signboard-card spot-3 js-depth-23 js-card">
+        <div class="signboard-img night-bg-3">
+          <img src="https://via.placeholder.com/300x160/f857a6/ffffff?text=Kappo+Wood" alt="仮画像">
+        </div>
         <span class="tag">国道沿いエリア</span>
         <h3>木彫り墨文字看板</h3>
-        <p>重厚感あふれる一枚板に手書きされた、歴史と伝統を感じる職人技の看板。</p>
+        
+        <div class="detail-info">
+          <p>「樹齢100年の屋久杉一枚板に地元の書道家が揮毫した逸品。」</p>
+          <div class="detail-spec">
+            <span>重量: 約25kg</span>
+            <span>漆塗り仕上げ</span>
+          </div>
+        </div>
       </div>
 
-      <div class="signboard-card spot-4 js-card">
-        <div class="signboard-img night-bg-4" id="img4">スイーツ イラスト</div>
+      <div class="signboard-card spot-4 js-depth-23 js-card">
+        <div class="signboard-img night-bg-4">
+          <img src="https://via.placeholder.com/300x160/ff8008/ffffff?text=Sweets+Art" alt="仮画像">
+        </div>
         <span class="tag">山形屋周辺</span>
         <h3>手書きイラスト看板</h3>
-        <p>季節ごとに描き直される、アットホームなスタンド型のイラスト板。</p>
+        
+        <div class="detail-info">
+          <p>「月替わりで店主が手描きするチョークアートスタンド。」</p>
+          <div class="detail-spec">
+            <span>更新: 毎月1日</span>
+            <span>手書き黒板</span>
+          </div>
+        </div>
       </div>
+
+    </div>
+
+    <!-- 近景：手前のパララックス浮遊物 -->
+    <div class="parallax-fg" id="paraFg">
+      <div class="fg-obj fg-1 js-depth-blur">✨</div>
+      <div class="fg-obj fg-2 js-depth-blur">🌟</div>
     </div>
   </div>
 
-  <div class="hud-controls">
-    <button class="btn-hud" id="themeBtn">🌙</button>
-    <button class="btn-hud" id="recenterBtn">🎯</button>
+  <!-- 右下格納式メニューUI -->
+  <div class="hud-menu-container" id="menuContainer">
+    <!-- メイン切替ボタン（ギア） -->
+    <button class="btn-hud" id="menuToggleBtn">⚙️</button>
+
+    <!-- メニュー格納アイテム群 -->
+    <div class="sub-menu">
+      <button class="btn-hud" id="themeBtn" title="昼夜切替">🌙</button>
+      <button class="btn-hud" id="recenterBtn" title="視点リセット">🎯</button>
+    </div>
   </div>
 
   <script>
     const viewport = document.getElementById('viewport');
     const world = document.getElementById('world');
-    const recenterBtn = document.getElementById('recenterBtn');
-    const themeBtn = document.getElementById('themeBtn');
+    const paraBg = document.getElementById('paraBg');
+    const paraFg = document.getElementById('paraFg');
     const fogCanvas = document.getElementById('fogCanvas');
     const ctx = fogCanvas.getContext('2d');
-    const cards = document.querySelectorAll('.js-card');
+
+    const menuContainer = document.getElementById('menuContainer');
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const recenterBtn = document.getElementById('recenterBtn');
+    const themeBtn = document.getElementById('themeBtn');
+
+    const depth1Elems = document.querySelectorAll('.js-depth-1');
+    const depth2Elems = document.querySelectorAll('.js-depth-2');
+    const depth23Cards = document.querySelectorAll('.js-depth-23');
 
     let isDayMode = false;
 
-    // 画面リサイズ
+    // キャンバスリサイズ
     function resizeCanvas() {
       fogCanvas.width = window.innerWidth;
       fogCanvas.height = window.innerHeight;
@@ -302,32 +476,30 @@
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    // 格納メニュー開閉トグル
+    menuToggleBtn.addEventListener('click', () => {
+      menuContainer.classList.toggle('is-open');
+    });
+
     // 昼夜モード切り替え
     themeBtn.addEventListener('click', () => {
       isDayMode = !isDayMode;
       document.body.classList.toggle('day-mode', isDayMode);
       themeBtn.innerText = isDayMode ? '☀️' : '🌙';
-
-      // 看板テキストの昼夜表記更新
-      document.getElementById('img1').innerText = isDayMode ? '居酒屋 日中' : '居酒屋 ネオン';
-      document.getElementById('img2').innerText = isDayMode ? 'カフェ 昼の木陰' : 'カフェ サイネージ';
-      document.getElementById('img3').innerText = isDayMode ? '割烹 陽光' : '割烹 銘木板';
-      document.getElementById('img4').innerText = isDayMode ? 'スイーツ 昼下がり' : 'スイーツ イラスト';
     });
 
     // 座標・スケール管理
     let currentX = 0, currentY = 0, targetX = 0, targetY = 0;
     let currentScale = 1, targetScale = 1;
 
-    // タッチ・ピンチ管理
+    // タッチ・ピンチ操作
     let isDragging = false;
     let startX = 0, startY = 0, lastX = 0, lastY = 0;
     let initialPinchDistance = null, initialScale = 1;
 
-    // 霧パーティクル配列
+    // 霧パーティクル
     const fogParticles = [];
 
-    // 霧の生成（昼夜で色変更）
     function addFog(x, y) {
       for (let i = 0; i < 2; i++) {
         fogParticles.push({
@@ -345,7 +517,6 @@
       return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
     }
 
-    // タッチイベント
     viewport.addEventListener('touchstart', (e) => {
       for (let i = 0; i < e.touches.length; i++) addFog(e.touches[i].clientX, e.touches[i].clientY);
 
@@ -366,11 +537,11 @@
       if (e.touches.length === 1 && isDragging) {
         targetX = e.touches[0].clientX - startX;
         targetY = e.touches[0].clientY - startY;
-        targetX = Math.max(-800, Math.min(800, targetX));
-        targetY = Math.max(-800, Math.min(800, targetY));
+        targetX = Math.max(-900, Math.min(900, targetX));
+        targetY = Math.max(-900, Math.min(900, targetY));
       } else if (e.touches.length === 2 && initialPinchDistance) {
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
-        targetScale = Math.max(0.5, Math.min(2.5, initialScale * (currentDistance / initialPinchDistance)));
+        targetScale = Math.max(0.4, Math.min(2.2, initialScale * (currentDistance / initialPinchDistance)));
       }
     }, { passive: true });
 
@@ -391,25 +562,52 @@
       targetX = 0; targetY = 0; lastX = 0; lastY = 0; targetScale = 1;
     });
 
-    // アニメーションループ
+    // メインアニメーションループ
     function animate() {
-      // スムース移動 ＆ パララックス
+      // 1. スムース座標補間
       currentX += (targetX - currentX) * 0.1;
       currentY += (targetY - currentY) * 0.1;
       currentScale += (targetScale - currentScale) * 0.1;
 
+      // 2. パララックス（視差）効果の適用
+      // 遠景（背景）：遅く動く (0.4倍)
+      paraBg.style.transform = `translate(calc(-50% + ${currentX * 0.4}px), calc(-50% + ${currentY * 0.4}px)) scale(${currentScale * 0.8})`;
+      // 中景（メイン）：標準移動 (1.0倍)
       world.style.transform = `translate(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px)) scale(${currentScale})`;
+      // 近景（手前）：早く動く (1.5倍)
+      paraFg.style.transform = `translate(calc(-50% + ${currentX * 1.5}px), calc(-50% + ${currentY * 1.5}px)) scale(${currentScale * 1.2})`;
 
-      // ① スケール連動：縮小時は詳細文字を非表示に
-      cards.forEach(card => {
-        if (currentScale < 0.85) {
-          card.classList.add('is-zoomed-out');
-        } else {
-          card.classList.remove('is-zoomed-out');
-        }
-      });
+      // 3. ① ズームレベル（3階層）に応じた被写界深度（ぼかし）と情報制御
+      if (currentScale < 0.75) {
+        // 【1階層目：遠目・広域】エリア名やタイトルにピントが合い、詳細カードはぼける
+        depth1Elems.forEach(el => { el.style.filter = 'blur(0px)'; el.style.opacity = '1'; });
+        depth2Elems.forEach(el => { el.style.filter = 'blur(2px)'; el.style.opacity = '0.7'; });
+        depth23Cards.forEach(card => {
+          card.style.filter = 'blur(5px)';
+          card.style.opacity = '0.4';
+          card.classList.remove('is-deep-detail');
+        });
+      } else if (currentScale >= 0.75 && currentScale < 1.35) {
+        // 【2階層目：中域・標準】店舗カードにピントが合い、広域エリア名・手前が薄くぼける
+        depth1Elems.forEach(el => { el.style.filter = 'blur(3px)'; el.style.opacity = '0.4'; });
+        depth2Elems.forEach(el => { el.style.filter = 'blur(0px)'; el.style.opacity = '1'; });
+        depth23Cards.forEach(card => {
+          card.style.filter = 'blur(0px)';
+          card.style.opacity = '1';
+          card.classList.remove('is-deep-detail'); // まだ詳細文は隠す
+        });
+      } else {
+        // 【3階層目：拡大・詳細】カード内のコア情報（店主コメントや寸法）が解禁展開
+        depth1Elems.forEach(el => { el.style.filter = 'blur(8px)'; el.style.opacity = '0.15'; });
+        depth2Elems.forEach(el => { el.style.filter = 'blur(2px)'; el.style.opacity = '0.8'; });
+        depth23Cards.forEach(card => {
+          card.style.filter = 'blur(0px)';
+          card.style.opacity = '1';
+          card.classList.add('is-deep-detail'); // コア情報展開
+        });
+      }
 
-      // ③ 霧の描画（昼：淡い水色 / 夜：ネオンピンク）
+      // 4. 霧の描画（昼：淡い水色 / 夜：ピンク）
       ctx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
       for (let i = fogParticles.length - 1; i >= 0; i--) {
         const p = fogParticles[i];
@@ -424,14 +622,11 @@
         }
 
         const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-        
         if (isDayMode) {
-          // 昼：淡い水色（シアン/ブルー系）
           grad.addColorStop(0, `rgba(160, 230, 255, ${p.alpha})`);
           grad.addColorStop(0.6, `rgba(0, 150, 255, ${p.alpha * 0.4})`);
           grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
         } else {
-          // 夜：ネオンピンク系
           grad.addColorStop(0, `rgba(255, 0, 150, ${p.alpha})`);
           grad.addColorStop(0.6, `rgba(255, 0, 100, ${p.alpha * 0.4})`);
           grad.addColorStop(1, 'rgba(255, 0, 150, 0)');
