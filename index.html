@@ -7,7 +7,7 @@
   <style>
     :root {
       --bg-color: #0c0e12;
-      --card-bg: rgba(22, 27, 34, 0.85);
+      --card-bg: rgba(22, 27, 34, 0.88);
       --card-border: rgba(255, 204, 0, 0.3);
       --text-main: #ffffff;
       --text-sub: #ccc;
@@ -16,7 +16,7 @@
 
     body.day-mode {
       --bg-color: #eef2f5;
-      --card-bg: rgba(255, 255, 255, 0.88);
+      --card-bg: rgba(255, 255, 255, 0.9);
       --card-border: rgba(0, 150, 255, 0.3);
       --text-main: #1a1a1a;
       --text-sub: #555555;
@@ -55,39 +55,39 @@
       z-index: 50;
     }
 
-    /* パララックス背景層（遠景） */
+    /* 遠景（奥深くの背景層） */
     .parallax-bg {
       position: absolute;
-      width: 2200px;
-      height: 2200px;
+      width: 3000px;
+      height: 3000px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background-image: 
-        radial-gradient(circle, rgba(255,204,0,0.15) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,204,0,0.12) 1px, transparent 1px),
         linear-gradient(var(--grid-color) 1px, transparent 1px),
         linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-      background-size: 40px 40px, 80px 80px, 80px 80px;
+      background-size: 60px 60px, 120px 120px, 120px 120px;
       pointer-events: none;
       will-change: transform;
     }
 
-    /* メインマップ層（中景） */
+    /* 中景（メインマップ層） */
     .world {
       position: absolute;
-      width: 2000px;
-      height: 2000px;
+      width: 2600px;
+      height: 2600px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       will-change: transform;
     }
 
-    /* パララックス近景層（前景） */
+    /* 近景（目の前の手前層） */
     .parallax-fg {
       position: absolute;
-      width: 2000px;
-      height: 2000px;
+      width: 2200px;
+      height: 2200px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -103,12 +103,12 @@
       transform: translate(-50%, -50%);
       text-align: center;
       pointer-events: none;
-      width: 300px;
+      width: 320px;
       transition: filter 0.3s, opacity 0.3s;
     }
 
     .center-title h1 {
-      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      font-size: clamp(1.8rem, 5vw, 2.5rem);
       letter-spacing: 0.05em;
       margin: 0 0 8px 0;
       color: #ffcc00;
@@ -120,7 +120,7 @@
       text-shadow: 0 0 12px rgba(0,119,255,0.3);
     }
 
-    /* 1階層目：エリア抽象広域表示アイコン */
+    /* 階層1：エリアバッジ（距離感を離すため広めに配置） */
     .area-badge {
       position: absolute;
       padding: 12px 24px;
@@ -142,15 +142,15 @@
       color: #0077ff;
     }
 
-    .area-1 { top: 32%; left: 30%; }
-    .area-2 { top: 25%; left: 60%; }
-    .area-3 { top: 65%; left: 28%; }
-    .area-4 { top: 62%; left: 62%; }
+    .area-1 { top: 22%; left: 22%; }
+    .area-2 { top: 18%; left: 72%; }
+    .area-3 { top: 75%; left: 18%; }
+    .area-4 { top: 72%; left: 75%; }
 
-    /* 看板カード基本スタイル */
+    /* 看板カード（中景） */
     .signboard-card {
       position: absolute;
-      width: clamp(180px, 45vw, 230px);
+      width: clamp(200px, 45vw, 250px);
       padding: 16px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -165,16 +165,14 @@
 
     .signboard-img {
       width: 100%;
-      height: 110px;
+      height: 120px;
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
       margin-bottom: 10px;
-      transition: all 0.5s ease;
       overflow: hidden;
-      position: relative;
     }
 
     .signboard-img img {
@@ -182,11 +180,6 @@
       height: 100%;
       object-fit: cover;
     }
-
-    .night-bg-1 { background: linear-gradient(135deg, #ff007f, #7928ca); color: #fff; }
-    .night-bg-2 { background: linear-gradient(135deg, #00f2fe, #4facfe); color: #fff; }
-    .night-bg-3 { background: linear-gradient(135deg, #f857a6, #ff5858); color: #fff; }
-    .night-bg-4 { background: linear-gradient(135deg, #ff8008, #ffc837); color: #fff; }
 
     .signboard-card h3 {
       margin: 0 0 4px 0;
@@ -204,7 +197,6 @@
       margin-bottom: 8px;
     }
 
-    /* 3階層目（拡大時）に展開するコア情報エリア */
     .detail-info {
       opacity: 0;
       max-height: 0;
@@ -212,7 +204,6 @@
       transition: opacity 0.4s ease, max-height 0.4s ease, margin-top 0.4s ease;
       font-size: 0.75rem;
       color: var(--text-sub);
-      border-top: 1px stroke rgba(255,255,255,0.1);
     }
 
     .detail-info p {
@@ -230,7 +221,6 @@
       font-size: 0.7rem;
     }
 
-    /* ズーム3階層目の状態（詳細情報展開） */
     .signboard-card.is-deep-detail .detail-info {
       opacity: 1;
       max-height: 200px;
@@ -239,39 +229,44 @@
       border-top: 1px solid rgba(255,255,255,0.1);
     }
 
-    .spot-1 { top: 35%; left: 32%; }
-    .spot-2 { top: 22%; left: 58%; }
-    .spot-3 { top: 62%; left: 26%; }
-    .spot-4 { top: 58%; left: 60%; }
+    /* 階層間隔を広げた配置 */
+    .spot-1 { top: 32%; left: 28%; }
+    .spot-2 { top: 25%; left: 62%; }
+    .spot-3 { top: 68%; left: 24%; }
+    .spot-4 { top: 64%; left: 66%; }
 
-    /* にぎやか用 3Dライク・浮遊オブジェ */
+    /* 散りばめオブジェクト（中景） */
     .deco-object {
       position: absolute;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.8rem;
+      font-size: 2rem;
       border-radius: 12px;
-      will-change: transform, filter;
+      will-change: transform, filter, opacity;
       transition: filter 0.3s ease, opacity 0.3s ease;
     }
-    .obj-1 { top: 20%; left: 20%; width: 60px; height: 60px; background: rgba(255,0,127,0.2); border: 1px solid #ff007f; transform: rotate(15deg); }
-    .obj-2 { top: 15%; left: 75%; width: 70px; height: 70px; background: rgba(0,242,254,0.2); border: 1px solid #00f2fe; border-radius: 50%; }
-    .obj-3 { top: 70%; left: 15%; width: 50px; height: 50px; background: rgba(255,204,0,0.2); border: 1px solid #ffcc00; transform: rotate(-25deg); }
-    .obj-4 { top: 75%; left: 78%; width: 80px; height: 50px; background: rgba(121,40,202,0.2); border: 1px solid #7928ca; border-radius: 30px; }
+    .obj-1 { top: 15%; left: 15%; width: 70px; height: 70px; background: rgba(255,0,127,0.15); border: 1px solid #ff007f; transform: rotate(15deg); }
+    .obj-2 { top: 12%; left: 82%; width: 80px; height: 80px; background: rgba(0,242,254,0.15); border: 1px solid #00f2fe; border-radius: 50%; }
+    .obj-3 { top: 82%; left: 12%; width: 60px; height: 60px; background: rgba(255,204,0,0.15); border: 1px solid #ffcc00; transform: rotate(-25deg); }
+    .obj-4 { top: 85%; left: 82%; width: 90px; height: 60px; background: rgba(121,40,202,0.15); border: 1px solid #7928ca; border-radius: 30px; }
 
-    /* 手前（近景）の大型浮遊オブジェ */
+    /* 最手前（カメラ直前）のオブジェクト群 */
     .fg-obj {
       position: absolute;
-      font-size: 3.5rem;
-      opacity: 0.4;
-      filter: blur(3px);
+      font-size: 5rem;
+      opacity: 0.6;
+      filter: blur(2px);
       pointer-events: none;
+      transition: opacity 0.3s ease, filter 0.3s ease;
+      will-change: transform, opacity, filter;
     }
-    .fg-1 { top: 25%; left: 45%; }
-    .fg-2 { top: 65%; left: 50%; }
+    .fg-1 { top: 20%; left: 42%; }
+    .fg-2 { top: 62%; left: 48%; }
+    .fg-3 { top: 40%; left: 18%; }
+    .fg-4 { top: 50%; left: 80%; }
 
-    /* 右下格納式メニューUI */
+    /* 右下UI */
     .hud-menu-container {
       position: fixed;
       bottom: clamp(20px, 5vw, 30px);
@@ -287,361 +282,3 @@
       width: 52px;
       height: 52px;
       border-radius: 50%;
-      background: #ffcc00;
-      color: #000;
-      border: none;
-      font-size: 1.3rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
-    }
-
-    .btn-hud:active {
-      transform: scale(0.9);
-    }
-
-    body.day-mode .btn-hud {
-      background: #0077ff;
-      color: #fff;
-    }
-
-    /* 格納されるサブボタン群 */
-    .sub-menu {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(20px) scale(0.8);
-      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    /* メニュー開状態 */
-    .hud-menu-container.is-open .sub-menu {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0) scale(1);
-    }
-
-    .hud-menu-container.is-open #menuToggleBtn {
-      transform: rotate(45deg);
-      background: #ff3366;
-      color: #fff;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="viewport" id="viewport">
-    <canvas id="fogCanvas"></canvas>
-
-    <!-- 遠景：パララックス背景 -->
-    <div class="parallax-bg" id="paraBg"></div>
-
-    <!-- 中景：メインコンテンツ・カード・飾りオブジェ -->
-    <div class="world" id="world">
-
-      <!-- 1階層目（遠目）：エリア名バッジ -->
-      <div class="area-badge area-1 js-depth-1">向田本町エリア 🏮</div>
-      <div class="area-badge area-2 js-depth-1">川内駅前エリア 🚄</div>
-      <div class="area-badge area-3 js-depth-1">国道沿いエリア 🚗</div>
-      <div class="area-badge area-4 js-depth-1">山形屋周辺エリア 🛍️</div>
-
-      <!-- 中央タイトル -->
-      <div class="center-title js-depth-1">
-        <h1>薩摩川内<br>看板探訪MAP</h1>
-        <p>ピンチ操作で階層ズーム<br>⚙️ボタンでメニュー展開</p>
-      </div>
-
-      <!-- にぎやか用飾りオブジェクト -->
-      <div class="deco-object obj-1 js-depth-2">🎲</div>
-      <div class="deco-object obj-2 js-depth-2">💍</div>
-      <div class="deco-object obj-3 js-depth-2">💎</div>
-      <div class="deco-object obj-4 js-depth-2">🔮</div>
-
-      <!-- 2〜3階層目：店舗看板カード -->
-      <div class="signboard-card spot-1 js-depth-23 js-card">
-        <div class="signboard-img night-bg-1">
-          <img src="https://via.placeholder.com/300x160/ff007f/ffffff?text=Izakaya+Neon" alt="仮画像">
-        </div>
-        <span class="tag">向田本町エリア</span>
-        <h3>昭和風情のネオン看板</h3>
-        
-        <!-- 3階層目（拡大時）で解禁されるコア情報 -->
-        <div class="detail-info">
-          <p>「40年間、向田の夜を照らし続けてきた自慢のネオン管です」</p>
-          <div class="detail-spec">
-            <span>寸法: 120cm×80cm</span>
-            <span>夜間点灯: 18:00〜</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="signboard-card spot-2 js-depth-23 js-card">
-        <div class="signboard-img night-bg-2">
-          <img src="https://via.placeholder.com/300x160/00f2fe/ffffff?text=Cafe+Sign" alt="仮画像">
-        </div>
-        <span class="tag">川内駅前エリア</span>
-        <h3>鉄文字のシンプル看板</h3>
-        
-        <div class="detail-info">
-          <p>「太陽の角度によって影の伸び方が変わる立体切り文字仕様。」</p>
-          <div class="detail-spec">
-            <span>素材: アイアン鋼</span>
-            <span>設置: 2021年</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="signboard-card spot-3 js-depth-23 js-card">
-        <div class="signboard-img night-bg-3">
-          <img src="https://via.placeholder.com/300x160/f857a6/ffffff?text=Kappo+Wood" alt="仮画像">
-        </div>
-        <span class="tag">国道沿いエリア</span>
-        <h3>木彫り墨文字看板</h3>
-        
-        <div class="detail-info">
-          <p>「樹齢100年の屋久杉一枚板に地元の書道家が揮毫した逸品。」</p>
-          <div class="detail-spec">
-            <span>重量: 約25kg</span>
-            <span>漆塗り仕上げ</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="signboard-card spot-4 js-depth-23 js-card">
-        <div class="signboard-img night-bg-4">
-          <img src="https://via.placeholder.com/300x160/ff8008/ffffff?text=Sweets+Art" alt="仮画像">
-        </div>
-        <span class="tag">山形屋周辺</span>
-        <h3>手書きイラスト看板</h3>
-        
-        <div class="detail-info">
-          <p>「月替わりで店主が手描きするチョークアートスタンド。」</p>
-          <div class="detail-spec">
-            <span>更新: 毎月1日</span>
-            <span>手書き黒板</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- 近景：手前のパララックス浮遊物 -->
-    <div class="parallax-fg" id="paraFg">
-      <div class="fg-obj fg-1 js-depth-blur">✨</div>
-      <div class="fg-obj fg-2 js-depth-blur">🌟</div>
-    </div>
-  </div>
-
-  <!-- 右下格納式メニューUI -->
-  <div class="hud-menu-container" id="menuContainer">
-    <!-- メイン切替ボタン（ギア） -->
-    <button class="btn-hud" id="menuToggleBtn">⚙️</button>
-
-    <!-- メニュー格納アイテム群 -->
-    <div class="sub-menu">
-      <button class="btn-hud" id="themeBtn" title="昼夜切替">🌙</button>
-      <button class="btn-hud" id="recenterBtn" title="視点リセット">🎯</button>
-    </div>
-  </div>
-
-  <script>
-    const viewport = document.getElementById('viewport');
-    const world = document.getElementById('world');
-    const paraBg = document.getElementById('paraBg');
-    const paraFg = document.getElementById('paraFg');
-    const fogCanvas = document.getElementById('fogCanvas');
-    const ctx = fogCanvas.getContext('2d');
-
-    const menuContainer = document.getElementById('menuContainer');
-    const menuToggleBtn = document.getElementById('menuToggleBtn');
-    const recenterBtn = document.getElementById('recenterBtn');
-    const themeBtn = document.getElementById('themeBtn');
-
-    const depth1Elems = document.querySelectorAll('.js-depth-1');
-    const depth2Elems = document.querySelectorAll('.js-depth-2');
-    const depth23Cards = document.querySelectorAll('.js-depth-23');
-
-    let isDayMode = false;
-
-    // キャンバスリサイズ
-    function resizeCanvas() {
-      fogCanvas.width = window.innerWidth;
-      fogCanvas.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    // 格納メニュー開閉トグル
-    menuToggleBtn.addEventListener('click', () => {
-      menuContainer.classList.toggle('is-open');
-    });
-
-    // 昼夜モード切り替え
-    themeBtn.addEventListener('click', () => {
-      isDayMode = !isDayMode;
-      document.body.classList.toggle('day-mode', isDayMode);
-      themeBtn.innerText = isDayMode ? '☀️' : '🌙';
-    });
-
-    // 座標・スケール管理
-    let currentX = 0, currentY = 0, targetX = 0, targetY = 0;
-    let currentScale = 1, targetScale = 1;
-
-    // タッチ・ピンチ操作
-    let isDragging = false;
-    let startX = 0, startY = 0, lastX = 0, lastY = 0;
-    let initialPinchDistance = null, initialScale = 1;
-
-    // 霧パーティクル
-    const fogParticles = [];
-
-    function addFog(x, y) {
-      for (let i = 0; i < 2; i++) {
-        fogParticles.push({
-          x: x + (Math.random() - 0.5) * 20,
-          y: y + (Math.random() - 0.5) * 20,
-          radius: 20 + Math.random() * 25,
-          alpha: 0.22,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4 - 0.2
-        });
-      }
-    }
-
-    function getDistance(t1, t2) {
-      return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
-    }
-
-    viewport.addEventListener('touchstart', (e) => {
-      for (let i = 0; i < e.touches.length; i++) addFog(e.touches[i].clientX, e.touches[i].clientY);
-
-      if (e.touches.length === 1) {
-        isDragging = true;
-        startX = e.touches[0].clientX - lastX;
-        startY = e.touches[0].clientY - lastY;
-      } else if (e.touches.length === 2) {
-        isDragging = false;
-        initialPinchDistance = getDistance(e.touches[0], e.touches[1]);
-        initialScale = targetScale;
-      }
-    }, { passive: true });
-
-    viewport.addEventListener('touchmove', (e) => {
-      for (let i = 0; i < e.touches.length; i++) addFog(e.touches[i].clientX, e.touches[i].clientY);
-
-      if (e.touches.length === 1 && isDragging) {
-        targetX = e.touches[0].clientX - startX;
-        targetY = e.touches[0].clientY - startY;
-        targetX = Math.max(-900, Math.min(900, targetX));
-        targetY = Math.max(-900, Math.min(900, targetY));
-      } else if (e.touches.length === 2 && initialPinchDistance) {
-        const currentDistance = getDistance(e.touches[0], e.touches[1]);
-        targetScale = Math.max(0.4, Math.min(2.2, initialScale * (currentDistance / initialPinchDistance)));
-      }
-    }, { passive: true });
-
-    viewport.addEventListener('touchend', (e) => {
-      if (e.touches.length < 2) initialPinchDistance = null;
-      if (e.touches.length === 0) {
-        isDragging = false;
-        lastX = targetX;
-        lastY = targetY;
-      }
-    });
-
-    viewport.addEventListener('mousemove', (e) => {
-      if (e.buttons === 1) addFog(e.clientX, e.clientY);
-    });
-
-    recenterBtn.addEventListener('click', () => {
-      targetX = 0; targetY = 0; lastX = 0; lastY = 0; targetScale = 1;
-    });
-
-    // メインアニメーションループ
-    function animate() {
-      // 1. スムース座標補間
-      currentX += (targetX - currentX) * 0.1;
-      currentY += (targetY - currentY) * 0.1;
-      currentScale += (targetScale - currentScale) * 0.1;
-
-      // 2. パララックス（視差）効果の適用
-      // 遠景（背景）：遅く動く (0.4倍)
-      paraBg.style.transform = `translate(calc(-50% + ${currentX * 0.4}px), calc(-50% + ${currentY * 0.4}px)) scale(${currentScale * 0.8})`;
-      // 中景（メイン）：標準移動 (1.0倍)
-      world.style.transform = `translate(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px)) scale(${currentScale})`;
-      // 近景（手前）：早く動く (1.5倍)
-      paraFg.style.transform = `translate(calc(-50% + ${currentX * 1.5}px), calc(-50% + ${currentY * 1.5}px)) scale(${currentScale * 1.2})`;
-
-      // 3. ① ズームレベル（3階層）に応じた被写界深度（ぼかし）と情報制御
-      if (currentScale < 0.75) {
-        // 【1階層目：遠目・広域】エリア名やタイトルにピントが合い、詳細カードはぼける
-        depth1Elems.forEach(el => { el.style.filter = 'blur(0px)'; el.style.opacity = '1'; });
-        depth2Elems.forEach(el => { el.style.filter = 'blur(2px)'; el.style.opacity = '0.7'; });
-        depth23Cards.forEach(card => {
-          card.style.filter = 'blur(5px)';
-          card.style.opacity = '0.4';
-          card.classList.remove('is-deep-detail');
-        });
-      } else if (currentScale >= 0.75 && currentScale < 1.35) {
-        // 【2階層目：中域・標準】店舗カードにピントが合い、広域エリア名・手前が薄くぼける
-        depth1Elems.forEach(el => { el.style.filter = 'blur(3px)'; el.style.opacity = '0.4'; });
-        depth2Elems.forEach(el => { el.style.filter = 'blur(0px)'; el.style.opacity = '1'; });
-        depth23Cards.forEach(card => {
-          card.style.filter = 'blur(0px)';
-          card.style.opacity = '1';
-          card.classList.remove('is-deep-detail'); // まだ詳細文は隠す
-        });
-      } else {
-        // 【3階層目：拡大・詳細】カード内のコア情報（店主コメントや寸法）が解禁展開
-        depth1Elems.forEach(el => { el.style.filter = 'blur(8px)'; el.style.opacity = '0.15'; });
-        depth2Elems.forEach(el => { el.style.filter = 'blur(2px)'; el.style.opacity = '0.8'; });
-        depth23Cards.forEach(card => {
-          card.style.filter = 'blur(0px)';
-          card.style.opacity = '1';
-          card.classList.add('is-deep-detail'); // コア情報展開
-        });
-      }
-
-      // 4. 霧の描画（昼：淡い水色 / 夜：ピンク）
-      ctx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
-      for (let i = fogParticles.length - 1; i >= 0; i--) {
-        const p = fogParticles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.radius += 0.4;
-        p.alpha -= 0.005;
-
-        if (p.alpha <= 0) {
-          fogParticles.splice(i, 1);
-          continue;
-        }
-
-        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-        if (isDayMode) {
-          grad.addColorStop(0, `rgba(160, 230, 255, ${p.alpha})`);
-          grad.addColorStop(0.6, `rgba(0, 150, 255, ${p.alpha * 0.4})`);
-          grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        } else {
-          grad.addColorStop(0, `rgba(255, 0, 150, ${p.alpha})`);
-          grad.addColorStop(0.6, `rgba(255, 0, 100, ${p.alpha * 0.4})`);
-          grad.addColorStop(1, 'rgba(255, 0, 150, 0)');
-        }
-
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      requestAnimationFrame(animate);
-    }
-
-    animate();
-  </script>
-</body>
-</html>
