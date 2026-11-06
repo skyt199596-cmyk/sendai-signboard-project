@@ -7,7 +7,7 @@
   <style>
     :root {
       --bg-color: #0c0e12;
-      --card-bg: rgba(22, 27, 34, 0.92);
+      --card-bg: rgba(22, 27, 34, 0.94);
       --card-border: rgba(255, 204, 0, 0.3);
       --text-main: #ffffff;
       --text-sub: #ccc;
@@ -16,7 +16,7 @@
 
     body.day-mode {
       --bg-color: #eef2f5;
-      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-bg: rgba(255, 255, 255, 0.96);
       --card-border: rgba(0, 150, 255, 0.3);
       --text-main: #1a1a1a;
       --text-sub: #555555;
@@ -44,9 +44,7 @@
       position: relative;
       overflow: hidden;
       cursor: grab;
-      /* スマホ描画の高速化 */
       transform: translateZ(0);
-      -webkit-font-smoothing: antialiased;
     }
 
     .viewport:active {
@@ -67,7 +65,7 @@
     .parallax-bg {
       position: absolute;
       width: 3200px;
-      height: 3400px;
+      height: 3200px;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) translateZ(0);
@@ -78,7 +76,6 @@
       background-size: 60px 60px, 120px 120px, 120px 120px;
       pointer-events: none;
       will-change: transform;
-      backface-visibility: hidden;
     }
 
     /* 中景（ワールド） */
@@ -90,7 +87,6 @@
       left: 50%;
       transform: translate(-50%, -50%) translateZ(0);
       will-change: transform;
-      backface-visibility: hidden;
     }
 
     /* 近景 */
@@ -104,9 +100,9 @@
       pointer-events: none;
       z-index: 40;
       will-change: transform;
-      backface-visibility: hidden;
     }
 
+    /* ★一番手前のタイトル（より大きく存在感アップ） */
     .center-title {
       position: absolute;
       top: 50%;
@@ -114,43 +110,44 @@
       transform: translate(-50%, -50%);
       text-align: center;
       pointer-events: none;
-      width: 340px;
-      will-change: opacity, filter;
+      width: clamp(300px, 80vw, 600px);
+      will-change: opacity;
     }
 
     .center-title h1 {
-      font-size: clamp(2rem, 6vw, 2.8rem);
-      letter-spacing: 0.05em;
-      margin: 0 0 10px 0;
+      font-size: clamp(2.8rem, 10vw, 4.5rem); /* サイズ大幅アップ */
+      letter-spacing: 0.08em;
+      line-height: 1.15;
+      margin: 0 0 16px 0;
       color: #ffcc00;
-      text-shadow: 0 0 16px rgba(255,204,0,0.6);
+      text-shadow: 0 0 24px rgba(255,204,0,0.6);
     }
 
     body.day-mode .center-title h1 {
       color: #0077ff;
-      text-shadow: 0 0 16px rgba(0,119,255,0.4);
+      text-shadow: 0 0 24px rgba(0,119,255,0.4);
     }
 
     .center-title p {
-      font-size: 0.9rem;
+      font-size: clamp(0.95rem, 3.5vw, 1.3rem);
       color: var(--text-sub);
       margin: 0;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     /* 1階層目：エリア広域バッジ */
     .area-badge {
       position: absolute;
-      padding: 10px 22px;
+      padding: clamp(8px, 2vw, 12px) clamp(16px, 4vw, 24px);
       background: rgba(255, 204, 0, 0.15);
       border: 2px solid #ffcc00;
       border-radius: 40px;
       color: #ffcc00;
       font-weight: bold;
-      font-size: 1.05rem;
+      font-size: clamp(0.9rem, 3vw, 1.2rem);
       box-shadow: 0 0 20px rgba(255,204,0,0.3);
       pointer-events: none;
-      will-change: opacity, filter;
+      will-change: opacity;
     }
 
     body.day-mode .area-badge {
@@ -159,38 +156,36 @@
       color: #0077ff;
     }
 
-    .area-1 { top: 22%; left: 24%; }
-    .area-2 { top: 20%; left: 68%; }
-    .area-3 { top: 72%; left: 22%; }
-    .area-4 { top: 70%; left: 70%; }
-    .area-5 { top: 46%; left: 16%; }
-    .area-6 { top: 46%; left: 76%; }
+    .area-1 { top: 20%; left: 22%; }
+    .area-2 { top: 18%; left: 68%; }
+    .area-3 { top: 74%; left: 20%; }
+    .area-4 { top: 72%; left: 70%; }
+    .area-5 { top: 46%; left: 14%; }
+    .area-6 { top: 46%; left: 78%; }
 
-    /* 看板カード */
+    /* ★看板カード（ドアップにならないようスマホ幅に最適化） */
     .signboard-card {
       position: absolute;
-      width: clamp(210px, 35vw, 260px);
-      padding: 16px;
+      width: clamp(180px, 40vw, 240px); /* 巨大化防止 */
+      padding: 14px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 18px;
+      border-radius: 16px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      will-change: opacity, filter;
+      will-change: opacity;
       z-index: 10;
-      /* チラつき防止（重いCSSフィルタを分離） */
       transform: translateZ(0);
-      backface-visibility: hidden;
     }
 
     .signboard-img {
       width: 100%;
-      height: 110px;
-      border-radius: 10px;
+      height: clamp(85px, 20vw, 110px);
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       overflow: hidden;
     }
 
@@ -202,52 +197,52 @@
 
     .signboard-card h3 {
       margin: 0 0 4px 0;
-      font-size: 1rem;
+      font-size: clamp(0.85rem, 2.8vw, 1rem); /* 適切な文字サイズ */
       color: var(--text-main);
+      word-break: break-all;
     }
 
     .signboard-card .tag {
       display: inline-block;
-      font-size: 0.7rem;
-      padding: 2px 8px;
+      font-size: clamp(0.6rem, 2vw, 0.7rem);
+      padding: 2px 6px;
       background-color: rgba(255, 204, 0, 0.15);
       color: #ffcc00;
       border-radius: 4px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    /* コア詳細情報（滑らかな透過フェード用） */
+    /* ★コア詳細情報（すぐ見えるよう切り替えタイミング調整） */
     .detail-info {
       opacity: 0;
       max-height: 0;
       overflow: hidden;
-      font-size: 0.75rem;
+      font-size: clamp(0.68rem, 2.2vw, 0.78rem);
       color: var(--text-sub);
       will-change: opacity, max-height;
-      transition: opacity 0.4s linear, max-height 0.4s ease;
+      transition: opacity 0.3s ease, max-height 0.3s ease;
     }
 
     .detail-info p {
-      margin: 6px 0 0 0;
-      line-height: 1.4;
+      margin: 4px 0 0 0;
+      line-height: 1.35;
     }
 
     .detail-spec {
       display: flex;
       justify-content: space-between;
-      margin-top: 8px;
-      padding: 6px;
+      margin-top: 6px;
+      padding: 4px 6px;
       background: rgba(255,255,255,0.08);
-      border-radius: 6px;
-      font-size: 0.7rem;
+      border-radius: 4px;
+      font-size: 0.65rem;
     }
 
-    /* 詳細情報展開時のスタイル */
     .signboard-card.is-deep-detail .detail-info {
       opacity: 1;
-      max-height: 200px;
-      margin-top: 10px;
-      padding-top: 8px;
+      max-height: 220px;
+      margin-top: 8px;
+      padding-top: 6px;
       border-top: 1px solid rgba(255,255,255,0.15);
     }
 
@@ -265,24 +260,21 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2rem;
+      font-size: 1.8rem;
       border-radius: 12px;
-      will-change: opacity, filter;
+      will-change: opacity;
     }
-    .obj-1 { top: 20%; left: 18%; width: 60px; height: 60px; background: rgba(255,0,127,0.15); border: 1px solid #ff007f; transform: rotate(15deg); }
-    .obj-2 { top: 16%; left: 78%; width: 70px; height: 70px; background: rgba(0,242,254,0.15); border: 1px solid #00f2fe; border-radius: 50%; }
-    .obj-3 { top: 78%; left: 18%; width: 50px; height: 50px; background: rgba(255,204,0,0.15); border: 1px solid #ffcc00; transform: rotate(-25deg); }
-    .obj-4 { top: 76%; left: 78%; width: 80px; height: 50px; background: rgba(121,40,202,0.15); border: 1px solid #7928ca; border-radius: 30px; }
-    .obj-5 { top: 32%; left: 48%; width: 50px; height: 50px; background: rgba(0,255,150,0.15); border: 1px solid #00ff96; transform: rotate(45deg); }
-    .obj-6 { top: 68%; left: 46%; width: 65px; height: 40px; background: rgba(255,100,0,0.15); border: 1px solid #ff6400; border-radius: 20px; }
+    .obj-1 { top: 20%; left: 18%; width: 50px; height: 50px; background: rgba(255,0,127,0.15); border: 1px solid #ff007f; transform: rotate(15deg); }
+    .obj-2 { top: 16%; left: 78%; width: 60px; height: 60px; background: rgba(0,242,254,0.15); border: 1px solid #00f2fe; border-radius: 50%; }
+    .obj-3 { top: 78%; left: 18%; width: 45px; height: 45px; background: rgba(255,204,0,0.15); border: 1px solid #ffcc00; transform: rotate(-25deg); }
+    .obj-4 { top: 76%; left: 78%; width: 70px; height: 45px; background: rgba(121,40,202,0.15); border: 1px solid #7928ca; border-radius: 30px; }
 
     .fg-obj {
       position: absolute;
-      font-size: 4rem;
-      opacity: 0.6;
-      filter: blur(2px);
+      font-size: 3.5rem;
+      opacity: 0.5;
       pointer-events: none;
-      will-change: opacity, filter;
+      will-change: opacity;
     }
     .fg-1 { top: 24%; left: 42%; }
     .fg-2 { top: 58%; left: 48%; }
@@ -358,17 +350,16 @@
       <div class="area-badge area-5 js-depth-1">川内川河川敷エリア 🌊</div>
       <div class="area-badge area-6 js-depth-1">太平橋周辺エリア 橋</div>
 
+      <!-- ★インパクトのある大見出しタイトル -->
       <div class="center-title js-depth-1">
         <h1>薩摩川内<br>看板探訪MAP</h1>
-        <p>ピンチイン / ホイール拡大で街へダイブ<br>ドラッグで自由に探索できます</p>
+        <p>指でドラッグ＆ピンチズーム<br>街の看板を探訪してみよう</p>
       </div>
 
       <div class="deco-object obj-1 js-depth-2">🎲</div>
       <div class="deco-object obj-2 js-depth-2">💍</div>
       <div class="deco-object obj-3 js-depth-2">💎</div>
       <div class="deco-object obj-4 js-depth-2">🔮</div>
-      <div class="deco-object obj-5 js-depth-2">🧩</div>
-      <div class="deco-object obj-6 js-depth-2">🎨</div>
 
       <div class="signboard-card spot-1 js-depth-23 js-card">
         <div class="signboard-img">
@@ -544,7 +535,7 @@
       themeBtn.innerText = isDayMode ? '☀️' : '🌙';
     });
 
-    // 座標・スケール管理（初期スケール 0.6）
+    // 初期スケール 0.6
     let currentX = 0, currentY = 0, targetX = 0, targetY = 0;
     let currentScale = 0.6, targetScale = 0.6;
 
@@ -555,12 +546,11 @@
     const fogParticles = [];
 
     function addFog(x, y) {
-      // スマホの負荷軽減のため、一度に出す粒子を1つに抑制
       fogParticles.push({
         x: x + (Math.random() - 0.5) * 15,
         y: y + (Math.random() - 0.5) * 15,
         radius: 18 + Math.random() * 20,
-        alpha: 0.2,
+        alpha: 0.18,
         vx: (Math.random() - 0.5) * 0.3,
         vy: (Math.random() - 0.5) * 0.3 - 0.2
       });
@@ -570,12 +560,12 @@
       return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
     }
 
-    // ホイールズーム
+    // ホイールズーム（ポインタ中心・拡大率上限を最大 1.35 に抑える）
     viewport.addEventListener('wheel', (e) => {
       e.preventDefault();
       
-      const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-      const newScale = Math.max(0.5, Math.min(1.8, targetScale * zoomFactor));
+      const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
+      const newScale = Math.max(0.5, Math.min(1.35, targetScale * zoomFactor));
       
       if (newScale === targetScale) return;
 
@@ -621,7 +611,8 @@
       } else if (e.touches.length === 2 && initialPinchDistance) {
         const currentDistance = getDistance(e.touches[0], e.touches[1]);
         const calculatedScale = initialScale * (currentDistance / initialPinchDistance);
-        targetScale = Math.max(0.5, Math.min(1.8, calculatedScale));
+        // 最大拡大率を 1.35 倍に制限（文字のドアップを防止）
+        targetScale = Math.max(0.5, Math.min(1.35, calculatedScale));
       }
     }, { passive: true });
 
@@ -664,91 +655,85 @@
       targetX = 0; targetY = 0; lastX = 0; lastY = 0; targetScale = 0.6;
     });
 
-    // 数値クランプ関数の定義（範囲制限用）
     function clamp(val, min, max) {
       return Math.max(min, Math.min(max, val));
     }
 
-    // メイン描画ループ（スマホ最適化版）
+    // 軽量アニメーションループ（ぼかし全廃・純粋なフェードインアウト）
     function animate() {
-      // スマホ向け補間係数（0.1 -> 滑らかに遅れて追従）
-      currentX += (targetX - currentX) * 0.1;
-      currentY += (targetY - currentY) * 0.1;
-      currentScale += (targetScale - currentScale) * 0.1;
+      currentX += (targetX - currentX) * 0.12;
+      currentY += (targetY - currentY) * 0.12;
+      currentScale += (targetScale - currentScale) * 0.12;
 
-      // 視差（パララックス）描画
+      // 視差
       paraBg.style.transform = `translate(calc(-50% + ${currentX * 0.3}px), calc(-50% + ${currentY * 0.3}px)) scale(${currentScale * 0.85}) translateZ(0)`;
       world.style.transform = `translate(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px)) scale(${currentScale}) translateZ(0)`;
       paraFg.style.transform = `translate(calc(-50% + ${currentX * 1.5}px), calc(-50% + ${currentY * 1.5}px)) scale(${currentScale * 1.25}) translateZ(0)`;
 
-      // 【修正】連続的な透明度・ぼかし計算（数式で連続変化させる）
-      // スケール 0.6 〜 1.8 の変化量を 0.0 〜 1.0 の正規化変数 (t) に変換
-      const t = clamp((currentScale - 0.6) / 0.9, 0, 1);
+      // スケール 0.6 〜 1.35 を 0.0 〜 1.0 に換算
+      const t = clamp((currentScale - 0.6) / 0.75, 0, 1);
 
-      // 1. タイトル ＆ エリアバッジ（全域階層）: スケールが広がるほど徐々に薄くぼける
-      const d1Opacity = clamp(1 - t * 1.2, 0, 1);
-      const d1Blur = (t * 6).toFixed(1);
+      // 1. 大見出しタイトル・エリアバッジ: 拡大するにつれてスムーズに消える
+      const d1Opacity = clamp(1 - t * 1.3, 0, 1);
       depth1Elems.forEach(el => {
         el.style.opacity = d1Opacity;
-        el.style.filter = d1Blur > 0.2 ? `blur(${d1Blur}px)` : 'none';
       });
 
-      // 2. 飾りオブジェ: 中盤でくっきり、離れるとぼける
-      const d2Opacity = clamp(1 - Math.abs(t - 0.4) * 1.2, 0.2, 1);
+      // 2. 飾りオブジェ
+      const d2Opacity = clamp(1 - Math.abs(t - 0.3) * 1.1, 0.2, 1);
       depth2Elems.forEach(el => {
         el.style.opacity = d2Opacity;
       });
 
-      // 3. 看板カード（中〜詳細階層）: スケールが寄るほど徐々にくっきり鮮明に浮き上がる
-      const cardOpacity = clamp(0.3 + t * 0.7, 0.3, 1);
-      const cardBlur = ((1 - t) * 6).toFixed(1); // 6px から 0px へ連続減少
+      // 3. 看板カード: 拡大するにつれてくっきり表示
+      const cardOpacity = clamp(0.35 + t * 0.65, 0.35, 1);
       depth23Cards.forEach(card => {
         card.style.opacity = cardOpacity;
-        card.style.filter = cardBlur > 0.2 ? `blur(${cardBlur}px)` : 'none';
 
-        // 十分にズームイン（t > 0.7）したら詳細文をスムーズ開口
-        if (t > 0.7) {
+        // ★【修正】ほんの少し拡大（t > 0.25）した段階で手前に詳細文を展開
+        if (t > 0.25) {
           card.classList.add('is-deep-detail');
         } else {
           card.classList.remove('is-deep-detail');
         }
       });
 
-      // 4. 最手前要素: 拡大すると画面奥から手前へ通り過ぎて消える
+      // 4. 近景要素
       fgItems.forEach(item => {
-        const fgOpacity = clamp(0.7 - t * 0.9, 0, 0.7);
-        item.style.opacity = fgOpacity;
+        item.style.opacity = clamp(0.6 - t * 0.8, 0, 0.6);
       });
 
-      // 5. 霧エフェクト描画
-      ctx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
-      for (let i = fogParticles.length - 1; i >= 0; i--) {
-        const p = fogParticles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.radius += 0.3;
-        p.alpha -= 0.006;
+      // 5. 霧描画（必要な時だけ演算）
+      if (fogParticles.length > 0) {
+        ctx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
+        for (let i = fogParticles.length - 1; i >= 0; i--) {
+          const p = fogParticles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.radius += 0.3;
+          p.alpha -= 0.007;
 
-        if (p.alpha <= 0) {
-          fogParticles.splice(i, 1);
-          continue;
+          if (p.alpha <= 0) {
+            fogParticles.splice(i, 1);
+            continue;
+          }
+
+          const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+          if (isDayMode) {
+            grad.addColorStop(0, `rgba(160, 230, 255, ${p.alpha})`);
+            grad.addColorStop(0.6, `rgba(0, 150, 255, ${p.alpha * 0.4})`);
+            grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          } else {
+            grad.addColorStop(0, `rgba(255, 0, 150, ${p.alpha})`);
+            grad.addColorStop(0.6, `rgba(255, 0, 100, ${p.alpha * 0.4})`);
+            grad.addColorStop(1, 'rgba(255, 0, 150, 0)');
+          }
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
         }
-
-        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-        if (isDayMode) {
-          grad.addColorStop(0, `rgba(160, 230, 255, ${p.alpha})`);
-          grad.addColorStop(0.6, `rgba(0, 150, 255, ${p.alpha * 0.4})`);
-          grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        } else {
-          grad.addColorStop(0, `rgba(255, 0, 150, ${p.alpha})`);
-          grad.addColorStop(0.6, `rgba(255, 0, 100, ${p.alpha * 0.4})`);
-          grad.addColorStop(1, 'rgba(255, 0, 150, 0)');
-        }
-
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fill();
       }
 
       requestAnimationFrame(animate);
